@@ -49,13 +49,13 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.deleteCapture).Methods("DELETE")
 	a.Router.HandleFunc("/capture", a.getCaptures).Methods("GET")
 	a.Router.HandleFunc("/capture/find", a.findCaptures).Methods("GET")
-	// Trim
-	a.Router.HandleFunc("/trim/{id:t[0-9]+}", a.postTrim).Methods("PUT")
-	a.Router.HandleFunc("/trim/{id:t[0-9]+}", a.updateTrim).Methods("POST")
-	//a.Router.HandleFunc("/trim/{id:t[0-9]+}", a.getTrim).Methods("GET")
-	a.Router.HandleFunc("/trim/{id:t[0-9]+}", a.deleteTrim).Methods("DELETE")
-	a.Router.HandleFunc("/trim", a.getFilesToTrim).Methods("GET")
-	a.Router.HandleFunc("/trim/find", a.findTrimes).Methods("GET")
+	// State
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("POST")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getStateID).Methods("GET")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
+	a.Router.HandleFunc("/state", a.getState).Methods("GET")
 	// Archive
 	a.Router.HandleFunc("/archive/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postArFile).Methods("PUT")
 	a.Router.HandleFunc("/archive/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.updateArFile).Methods("POST")
@@ -90,6 +90,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/ingest", a.getIngest).Methods("GET")
 	a.Router.HandleFunc("/ingest/find", a.findIngest).Methods("GET")
 	// Trimmer
+	a.Router.HandleFunc("/trim", a.getFilesToTrim).Methods("GET")
 	a.Router.HandleFunc("/trimmer/{id:t[0-9]+}", a.postTrimmerID).Methods("PUT")
 	a.Router.HandleFunc("/trimmer/{id:t[0-9]+}/wfstatus/{jsonb}", a.postTrimmerValue).Methods("POST")
 	a.Router.HandleFunc("/trimmer/{id:t[0-9]+}/{jsonb}", a.postTrimmerJSON).Methods("POST")

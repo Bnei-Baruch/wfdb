@@ -1,4 +1,4 @@
-// rest_trim.go
+// rest_state.go
 
 package main
 
@@ -12,20 +12,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func (a *App) findTrimes(w http.ResponseWriter, r *http.Request) {
+func (a *App) findState(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	trimes, err := findTrimes(a.DB, key, value)
+	states, err := findStates(a.DB, key, value)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, trimes)
+	respondWithJSON(w, http.StatusOK, states)
 }
 
-func (a *App) getTrimes(w http.ResponseWriter, r *http.Request) {
+func (a *App) getStates(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 
@@ -36,21 +36,21 @@ func (a *App) getTrimes(w http.ResponseWriter, r *http.Request) {
 		start = 0
 	}
 
-	trimes, err := getTrimes(a.DB, start, count)
+	states, err := getStates(a.DB, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, trimes)
+	respondWithJSON(w, http.StatusOK, states)
 }
 
-func (a *App) getTrim(w http.ResponseWriter, r *http.Request) {
-	var t trim
+func (a *App) getState(w http.ResponseWriter, r *http.Request) {
+	var s state
 	vars := mux.Vars(r)
-	t.TrimID = vars["id"]
+	s.StateID = vars["id"]
 
-	if err := t.getTrim(a.DB); err != nil {
+	if err := s.getState(a.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "Not Found")
@@ -60,23 +60,23 @@ func (a *App) getTrim(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, t.Data)
+	respondWithJSON(w, http.StatusOK, s.Data)
 }
 
-func (a *App) postTrim(w http.ResponseWriter, r *http.Request) {
-	var t trim
+func (a *App) postState(w http.ResponseWriter, r *http.Request) {
+	var s state
 	vars := mux.Vars(r)
-	t.TrimID = vars["id"]
+	s.StateID = vars["id"]
 
 	d := json.NewDecoder(r.Body)
-	if err := d.Decode(&t.Data); err != nil {
+	if err := d.Decode(&s.Data); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
 		return
 	}
 
 	defer r.Body.Close()
 
-	if err := t.postTrim(a.DB); err != nil {
+	if err := s.postState(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -84,20 +84,20 @@ func (a *App) postTrim(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) updateTrim(w http.ResponseWriter, r *http.Request) {
-	var t trim
+func (a *App) updateState(w http.ResponseWriter, r *http.Request) {
+	var s state
 	vars := mux.Vars(r)
-	t.TrimID = vars["id"]
+	s.StateID = vars["id"]
 
 	d := json.NewDecoder(r.Body)
-	if err := d.Decode(&t.Data); err != nil {
+	if err := d.Decode(&s.Data); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
 		return
 	}
 
 	defer r.Body.Close()
 
-	if err := t.updateTrim(a.DB); err != nil {
+	if err := s.updateState(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -105,12 +105,12 @@ func (a *App) updateTrim(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) deleteTrim(w http.ResponseWriter, r *http.Request) {
-	var t trim
+func (a *App) deleteState(w http.ResponseWriter, r *http.Request) {
+	var s state
 	vars := mux.Vars(r)
-	t.TrimID = vars["id"]
+	s.StateID = vars["id"]
 
-	if err := t.deleteTrim(a.DB); err != nil {
+	if err := s.deleteState(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -78,13 +78,12 @@ CONSTRAINT ingest_pkey PRIMARY KEY (capture_id)
 )`
 
 
-const createTrimmTable = `CREATE TABLE IF NOT EXISTS trim
+const createStateTable = `CREATE TABLE IF NOT EXISTS state
 (
 id SERIAL,
-trim_id TEXT NOT NULL,
-created_datetime timestamp NOT NULL DEFAULT now(),
+state_id TEXT NOT NULL,
 data jsonb NOT NULL,
-CONSTRAINT trim_pkey PRIMARY KEY (trim_id)
+CONSTRAINT state_pkey PRIMARY KEY (state_id)
 )`
 
 const createTrimmerTable = `CREATE TABLE IF NOT EXISTS trimmer
