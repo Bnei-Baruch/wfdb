@@ -52,8 +52,8 @@ func (a *App) initializeRoutes() {
 	// State
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("POST")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getStateID).Methods("GET")
+	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("POST")
+	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getStateID).Methods("GET")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
 	a.Router.HandleFunc("/state", a.getState).Methods("GET")
 	// Archive
@@ -109,6 +109,8 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/aricha", a.getAricha).Methods("GET")
 	a.Router.HandleFunc("/bdika", a.getBdika).Methods("GET")
 	a.Router.HandleFunc("/aricha/find", a.findAricha).Methods("GET")
+	// Tasks
+	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
