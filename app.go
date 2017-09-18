@@ -111,6 +111,10 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/aricha/find", a.findAricha).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
+	// Labels
+	a.Router.HandleFunc("/labels", a.getLabels).Methods("GET")
+	a.Router.HandleFunc("/label/{id:[0-9]+}", a.getLabel).Methods("GET")
+	a.Router.HandleFunc("/labels/find", a.findLabels).Methods("GET")
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
