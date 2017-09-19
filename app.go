@@ -90,6 +90,16 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.deleteIngestID).Methods("DELETE")
 	a.Router.HandleFunc("/ingest", a.getIngest).Methods("GET")
 	a.Router.HandleFunc("/ingest/find", a.findIngest).Methods("GET")
+	// Dgima
+	a.Router.HandleFunc("/drim", a.getFilesToDgima).Methods("GET")
+	a.Router.HandleFunc("/dgima/{id:d[0-9]+}", a.postDgimaID).Methods("PUT")
+	a.Router.HandleFunc("/dgima/{id:d[0-9]+}/wfstatus/{jsonb}", a.postDgimaValue).Methods("POST")
+	a.Router.HandleFunc("/dgima/{id:d[0-9]+}/{jsonb}", a.postDgimaJSON).Methods("POST")
+	a.Router.HandleFunc("/dgima/{id:d[0-9]+}", a.getDgimaID).Methods("GET")
+	a.Router.HandleFunc("/dgima/{id:[0-9]+}", a.getDgimaByID).Methods("GET")
+	a.Router.HandleFunc("/dgima/{id:d[0-9]+}", a.deleteDgimaID).Methods("DELETE")
+	a.Router.HandleFunc("/dgima", a.getDgima).Methods("GET")
+	a.Router.HandleFunc("/dgima/find", a.findDgima).Methods("GET")
 	// Trimmer
 	a.Router.HandleFunc("/trim", a.getFilesToTrim).Methods("GET")
 	a.Router.HandleFunc("/trimmer/{id:t[0-9]+}", a.postTrimmerID).Methods("PUT")

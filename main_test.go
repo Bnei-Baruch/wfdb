@@ -114,6 +114,22 @@ CONSTRAINT trimmer_pkey PRIMARY KEY (trim_id)
 //parent_osha1 VARCHAR(40),
 //parent_psha1 VARCHAR(40),
 
+const createDgimaTable = `CREATE TABLE IF NOT EXISTS dgima
+(
+id BIGSERIAL,
+dgima_id TEXT NOT NULL,
+date VARCHAR(10),
+file_name TEXT,
+inpoints REAL[],
+outpoints REAL[],
+parent jsonb,
+line jsonb,
+original jsonb,
+proxy jsonb,
+wfstatus jsonb,
+CONSTRAINT dgima_pkey PRIMARY KEY (dgima_id)
+)`
+
 const createArichaTable = `CREATE TABLE IF NOT EXISTS aricha
 (
 id BIGSERIAL,
