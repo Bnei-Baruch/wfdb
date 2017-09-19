@@ -43,12 +43,13 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	// Capture
-	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.postCapture).Methods("PUT")
-	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.updateCapture).Methods("POST")
-	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.getCapture).Methods("GET")
-	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.deleteCapture).Methods("DELETE")
-	a.Router.HandleFunc("/capture", a.getCaptures).Methods("GET")
-	a.Router.HandleFunc("/capture/find", a.findCaptures).Methods("GET")
+	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.postCaptureID).Methods("PUT")
+	a.Router.HandleFunc("/capture/{id:c[0-9]+}/wfstatus/{jsonb}", a.postCaptureValue).Methods("POST")
+	a.Router.HandleFunc("/capture/{id:c[0-9]+}/{jsonb}", a.postCaptureJSON).Methods("POST")
+	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.getCaptureID).Methods("GET")
+	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.deleteCaptureID).Methods("DELETE")
+	a.Router.HandleFunc("/capture", a.getCapture).Methods("GET")
+	a.Router.HandleFunc("/capture/find", a.findCapture).Methods("GET")
 	// State
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")

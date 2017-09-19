@@ -54,10 +54,17 @@ CONSTRAINT products_pkey PRIMARY KEY (id)
 
 const createCaptureTable = `CREATE TABLE IF NOT EXISTS capture
 (
-id SERIAL,
+id BIGSERIAL,
 capture_id TEXT NOT NULL,
-created_datetime timestamp NOT NULL DEFAULT now(),
-data jsonb NOT NULL,
+capture_src TEXT,
+date VARCHAR(10),
+start_name TEXT,
+stop_name TEXT,
+sha1 VARCHAR(40),
+line jsonb,
+original jsonb,
+proxy jsonb,
+wfstatus jsonb,
 CONSTRAINT capture_pkey PRIMARY KEY (capture_id)
 )`
 

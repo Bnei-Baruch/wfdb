@@ -12,20 +12,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func (a *App) findCaptures(w http.ResponseWriter, r *http.Request) {
+func (a *App) findCapture(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	captures, err := findCaptures(a.DB, key, value)
+	files, err := findCapture(a.DB, key, value)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, captures)
+	respondWithJSON(w, http.StatusOK, files)
 }
 
-func (a *App) getCaptures(w http.ResponseWriter, r *http.Request) {
+func (a *App) getCapture(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 
@@ -36,21 +36,21 @@ func (a *App) getCaptures(w http.ResponseWriter, r *http.Request) {
 		start = 0
 	}
 
-	captures, err := getCaptures(a.DB, start, count)
+	files, err := getCapture(a.DB, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, captures)
+	respondWithJSON(w, http.StatusOK, files)
 }
 
-func (a *App) getCapture(w http.ResponseWriter, r *http.Request) {
+func (a *App) getCaptureID(w http.ResponseWriter, r *http.Request) {
 	var c capture
 	vars := mux.Vars(r)
 	c.CaptureID = vars["id"]
 
-	if err := c.getCapture(a.DB); err != nil {
+	if err := c.getCaptureID(a.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "Not Found")
@@ -60,23 +60,23 @@ func (a *App) getCapture(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, c.Data)
+	respondWithJSON(w, http.StatusOK, c)
 }
 
-func (a *App) postCapture(w http.ResponseWriter, r *http.Request) {
+func (a *App) postCaptureID(w http.ResponseWriter, r *http.Request) {
 	var c capture
 	vars := mux.Vars(r)
 	c.CaptureID = vars["id"]
 
 	d := json.NewDecoder(r.Body)
-	if err := d.Decode(&c.Data); err != nil {
+	if err := d.Decode(&c); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
 		return
 	}
 
 	defer r.Body.Close()
 
-	if err := c.postCapture(a.DB); err != nil {
+	if err := c.postCaptureID(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -84,20 +84,22 @@ func (a *App) postCapture(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) updateCapture(w http.ResponseWriter, r *http.Request) {
+func (a *App) postCaptureJSON(w http.ResponseWriter, r *http.Request) {
 	var c capture
 	vars := mux.Vars(r)
 	c.CaptureID = vars["id"]
+	key := vars["jsonb"]
+	var jsonb map[string]interface{}
 
 	d := json.NewDecoder(r.Body)
-	if err := d.Decode(&c.Data); err != nil {
+	if err := d.Decode(&jsonb); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
 		return
 	}
 
 	defer r.Body.Close()
 
-	if err := c.updateCapture(a.DB); err != nil {
+	if err := c.postCaptureJSON(a.DB, jsonb, key); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -105,12 +107,29 @@ func (a *App) updateCapture(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) deleteCapture(w http.ResponseWriter, r *http.Request) {
+func (a *App) postCaptureValue(w http.ResponseWriter, r *http.Request) {
+	var c capture
+	vars := mux.Vars(r)
+	c.CaptureID = vars["id"]
+	key := vars["jsonb"]
+	value := r.FormValue("value")
+	//value := strconv.FormatBool(r.FormValue("value"))
+	//value, _ := strconv.ParseBool(r.FormValue("value"))
+
+	if err := c.postCaptureValue(a.DB, value, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func (a *App) deleteCaptureID(w http.ResponseWriter, r *http.Request) {
 	var c capture
 	vars := mux.Vars(r)
 	c.CaptureID = vars["id"]
 
-	if err := c.deleteCapture(a.DB); err != nil {
+	if err := c.deleteCaptureID(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
