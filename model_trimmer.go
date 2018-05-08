@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/lib/pq"
+	"fmt"
 )
 
 type trimmer struct {
@@ -53,41 +54,10 @@ func findTrimmer(db *sql.DB, key string, value string) ([]trimmer, error) {
 	return objects, nil
 }
 
-func findTrimmerByLINE(db *sql.DB, key string, value string) ([]trimmer, error) {
+func findTrimmerByJSON(db *sql.DB, ep string, key string, value string) ([]trimmer, error) {
 
-	rows, err := db.Query(
-		"SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE line ->> $1 = $2 ORDER BY trim_id", key, value)
-
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	objects := []trimmer{}
-
-	for rows.Next() {
-		var t trimmer
-		var inpoints, outpoints, parent, line, original, proxy, wfstatus []byte
-		if err := rows.Scan(&t.ID, &t.TrimID, &t.Date, &t.FileName, &inpoints, &outpoints, &parent, &line, &original, &proxy, &wfstatus); err != nil {
-			return nil, err
-		}
-		json.Unmarshal(inpoints, &t.Inpoints)
-		json.Unmarshal(outpoints, &t.Outpoints)
-		json.Unmarshal(parent, &t.Parent)
-		json.Unmarshal(line, &t.Line)
-		json.Unmarshal(original, &t.Original)
-		json.Unmarshal(proxy, &t.Proxy)
-		json.Unmarshal(wfstatus, &t.Wfstatus)
-		objects = append(objects, t)
-	}
-
-	return objects, nil
-}
-
-func findTrimmerByPARENT(db *sql.DB, key string, value string) ([]trimmer, error) {
-
-	rows, err := db.Query(
-		"SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE parent ->> $1 = $2 ORDER BY trim_id", key, value)
+	sqlStatement := fmt.Sprintf("SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE %s ->> '%s' = '%s' ORDER BY trim_id;", ep, key, value)
+	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
 		return nil, err
@@ -110,6 +80,10 @@ func findTrimmerByPARENT(db *sql.DB, key string, value string) ([]trimmer, error
 		json.Unmarshal(proxy, &t.Proxy)
 		json.Unmarshal(wfstatus, &t.Wfstatus)
 		objects = append(objects, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return objects, nil

@@ -25,24 +25,13 @@ func (a *App) findTrimmer(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
-func (a *App) findTrimmerByLINE(w http.ResponseWriter, r *http.Request) {
+func (a *App) findTrimmerByJSON(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ep := vars["jsonb"]
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	files, err := findTrimmerByLINE(a.DB, key, value)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	respondWithJSON(w, http.StatusOK, files)
-}
-
-func (a *App) findTrimmerByPARENT(w http.ResponseWriter, r *http.Request) {
-	key := r.FormValue("key")
-	value := r.FormValue("value")
-
-	files, err := findTrimmerByPARENT(a.DB, key, value)
+	files, err := findTrimmerByJSON(a.DB, ep, key, value)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
