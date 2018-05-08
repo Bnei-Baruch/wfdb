@@ -111,6 +111,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/trimmer", a.getTrimmer).Methods("GET")
 	a.Router.HandleFunc("/trimmer/find", a.findTrimmer).Methods("GET")
 	a.Router.HandleFunc("/trimmer/line", a.findTrimmerByLINE).Methods("GET")
+	a.Router.HandleFunc("/trimmer/parent", a.findTrimmerByPARENT).Methods("GET")
 	// Aricha
 	a.Router.HandleFunc("/aricha/{id:a[0-9]+}", a.postArichaID).Methods("PUT")
 	a.Router.HandleFunc("/aricha/{id:a[0-9]+}/wfstatus/{jsonb}", a.postArichaValue).Methods("POST")

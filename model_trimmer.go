@@ -84,6 +84,37 @@ func findTrimmerByLINE(db *sql.DB, key string, value string) ([]trimmer, error) 
 	return objects, nil
 }
 
+func findTrimmerByPARENT(db *sql.DB, key string, value string) ([]trimmer, error) {
+
+	rows, err := db.Query(
+		"SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE parent ->> $1 = $2 ORDER BY trim_id", key, value)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	objects := []trimmer{}
+
+	for rows.Next() {
+		var t trimmer
+		var inpoints, outpoints, parent, line, original, proxy, wfstatus []byte
+		if err := rows.Scan(&t.ID, &t.TrimID, &t.Date, &t.FileName, &inpoints, &outpoints, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(inpoints, &t.Inpoints)
+		json.Unmarshal(outpoints, &t.Outpoints)
+		json.Unmarshal(parent, &t.Parent)
+		json.Unmarshal(line, &t.Line)
+		json.Unmarshal(original, &t.Original)
+		json.Unmarshal(proxy, &t.Proxy)
+		json.Unmarshal(wfstatus, &t.Wfstatus)
+		objects = append(objects, t)
+	}
+
+	return objects, nil
+}
+
 func getTrimmer(db *sql.DB, start, count int) ([]trimmer, error) {
 	rows, err := db.Query(
 		"SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer ORDER BY trim_id DESC LIMIT $1 OFFSET $2",
