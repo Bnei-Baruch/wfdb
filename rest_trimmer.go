@@ -25,6 +25,19 @@ func (a *App) findTrimmer(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) findTrimmerByLINE(w http.ResponseWriter, r *http.Request) {
+	key := r.FormValue("key")
+	value := r.FormValue("value")
+
+	files, err := findTrimmerByLINE(a.DB, key, value)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, files)
+}
+
 func (a *App) getTrimmer(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
