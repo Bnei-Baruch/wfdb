@@ -68,7 +68,7 @@ func getKmFiles(db *sql.DB, start, count int) ([]kmedia, error) {
 func (a *kmedia) getKmFile(db *sql.DB) error {
 
 	return db.QueryRow("SELECT * FROM kmedia WHERE kmedia_id = $1",
-		a.KmediaID).Scan(&a)
+		a.KmediaID).Scan(&a.ID, &a.KmediaID, &a.Date, &a.FileName, &a.Language, &a.Extension, &a.Size, &a.Sha1, &a.Pattern)
 }
 
 func (a *kmedia) postKmFile(db *sql.DB) error {

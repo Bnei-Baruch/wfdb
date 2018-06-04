@@ -69,7 +69,7 @@ func getCarbonFiles(db *sql.DB, start, count int) ([]carbon, error) {
 func (a *carbon) getCarbonFile(db *sql.DB) error {
 
 	return db.QueryRow("SELECT id, carbon_id, send_id,  date, file_name, language, extension, size, sha1, duration FROM carbon WHERE carbon_id = $1",
-		a.CarbonID).Scan(&a.ID, &a.CarbonID, &a.Date, &a.FileName, &a.Language, &a.Extension, &a.Size, &a.Sha1)
+		a.CarbonID).Scan(&a.ID, &a.CarbonID, &a.SendID, &a.Date, &a.FileName, &a.Language, &a.Extension, &a.Size, &a.Sha1, &a.Duration)
 }
 
 func (a *carbon) postCarbonFile(db *sql.DB) error {
