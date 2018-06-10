@@ -21,7 +21,7 @@ type kmedia struct {
 }
 
 func findKmFiles(db *sql.DB, key string, value string) ([]kmedia, error) {
-	sqlStatement := `SELECT * FROM kmedia WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT id, kmedia_id, date, file_name, language, extension, size, sha1, pattern, send_id, source FROM kmedia WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -45,7 +45,7 @@ func findKmFiles(db *sql.DB, key string, value string) ([]kmedia, error) {
 
 func getKmFiles(db *sql.DB, start, count int) ([]kmedia, error) {
 	rows, err := db.Query(
-		"SELECT * FROM kmedia ORDER BY id DESC LIMIT $1 OFFSET $2",
+		"SELECT id, kmedia_id, date, file_name, language, extension, size, sha1, pattern, send_id, source FROM kmedia ORDER BY id DESC LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -69,7 +69,7 @@ func getKmFiles(db *sql.DB, start, count int) ([]kmedia, error) {
 
 func (a *kmedia) getKmFile(db *sql.DB) error {
 
-	return db.QueryRow("SELECT * FROM kmedia WHERE kmedia_id = $1",
+	return db.QueryRow("SELECT id, kmedia_id, date, file_name, language, extension, size, sha1, pattern, send_id, source FROM kmedia WHERE kmedia_id = $1",
 		a.KmediaID).Scan(&a.ID, &a.KmediaID, &a.Date, &a.FileName, &a.Language, &a.Extension, &a.Size, &a.Sha1, &a.Pattern, &a.SendID, &a.Source)
 }
 
