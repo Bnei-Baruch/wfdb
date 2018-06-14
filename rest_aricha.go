@@ -25,6 +25,21 @@ func (a *App) findAricha(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) findArichaByJSON(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ep := vars["jsonb"]
+	key := r.FormValue("key")
+	value := r.FormValue("value")
+
+	files, err := findArichaByJSON(a.DB, ep, key, value)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, files)
+}
+
 func (a *App) getAricha(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))

@@ -122,6 +122,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/aricha", a.getAricha).Methods("GET")
 	a.Router.HandleFunc("/bdika", a.getBdika).Methods("GET")
 	a.Router.HandleFunc("/aricha/find", a.findAricha).Methods("GET")
+	a.Router.HandleFunc("/aricha/{jsonb}", a.findArichaByJSON).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
 	// Labels

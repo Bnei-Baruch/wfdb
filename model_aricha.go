@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 )
 
 type aricha struct {
@@ -20,7 +21,7 @@ type aricha struct {
 }
 
 func findAricha(db *sql.DB, key string, value string) ([]aricha, error) {
-	sqlStatement := `SELECT * FROM aricha WHERE `+key+` LIKE '%`+value+`' ORDER BY aricha_id`
+	sqlStatement := `SELECT * FROM aricha WHERE `+key+` LIKE '%`+value+`%' ORDER BY aricha_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -47,6 +48,40 @@ func findAricha(db *sql.DB, key string, value string) ([]aricha, error) {
 
 	return objects, nil
 }
+
+func findArichaByJSON(db *sql.DB, ep string, key string, value string) ([]aricha, error) {
+
+	sqlStatement := fmt.Sprintf("SELECT id, aricha_id, date, file_name, parent, line, original, proxy, wfstatus FROM aricha WHERE %s ->> '%s' = '%s' ORDER BY aricha_id;", ep, key, value)
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	objects := []aricha{}
+
+	for rows.Next() {
+		var t aricha
+		var parent, line, original, proxy, wfstatus []byte
+		if err := rows.Scan(&t.ID, &t.ArichaID, &t.Date, &t.FileName, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(parent, &t.Parent)
+		json.Unmarshal(line, &t.Line)
+		json.Unmarshal(original, &t.Original)
+		json.Unmarshal(proxy, &t.Proxy)
+		json.Unmarshal(wfstatus, &t.Wfstatus)
+		objects = append(objects, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return objects, nil
+}
+
 
 func getAricha(db *sql.DB, start, count int) ([]aricha, error) {
 	rows, err := db.Query(

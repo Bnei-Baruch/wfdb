@@ -20,7 +20,7 @@ type archive struct {
 }
 
 func findArFiles(db *sql.DB, key string, value string) ([]archive, error) {
-	sqlStatement := `SELECT id, archive_id, date, file_name, language, extension, size, sha1, send_id, source FROM archive WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT id, archive_id, date, file_name, language, extension, size, sha1, send_id, source FROM archive WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

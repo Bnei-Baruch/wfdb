@@ -21,7 +21,7 @@ type kmedia struct {
 }
 
 func findKmFiles(db *sql.DB, key string, value string) ([]kmedia, error) {
-	sqlStatement := `SELECT id, kmedia_id, date, file_name, language, extension, size, sha1, pattern, send_id, source FROM kmedia WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT id, kmedia_id, date, file_name, language, extension, size, sha1, pattern, send_id, source FROM kmedia WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

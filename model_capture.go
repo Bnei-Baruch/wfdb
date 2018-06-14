@@ -22,7 +22,7 @@ type capture struct {
 }
 
 func findCapture(db *sql.DB, key string, value string) ([]capture, error) {
-	sqlStatement := `SELECT * FROM capture WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT * FROM capture WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

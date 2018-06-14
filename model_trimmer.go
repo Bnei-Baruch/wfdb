@@ -24,7 +24,7 @@ type trimmer struct {
 }
 
 func findTrimmer(db *sql.DB, key string, value string) ([]trimmer, error) {
-	sqlStatement := `SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE `+key+` LIKE '%`+value+`' ORDER BY trim_id`
+	sqlStatement := `SELECT id, trim_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM trimmer WHERE `+key+` LIKE '%`+value+`%' ORDER BY trim_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

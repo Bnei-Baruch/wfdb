@@ -23,7 +23,7 @@ type dgima struct {
 }
 
 func findDgima(db *sql.DB, key string, value string) ([]dgima, error) {
-	sqlStatement := `SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE `+key+` LIKE '%`+value+`' ORDER BY dgima_id`
+	sqlStatement := `SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE `+key+` LIKE '%`+value+`%' ORDER BY dgima_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

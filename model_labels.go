@@ -23,7 +23,7 @@ type labels struct {
 }
 
 func findLabels(db *sql.DB, key string, value string) ([]labels, error) {
-	sqlStatement := `SELECT * FROM labels WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT * FROM labels WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

@@ -24,7 +24,7 @@ type insert struct {
 }
 
 func findInsertFiles(db *sql.DB, key string, value string) ([]insert, error) {
-	sqlStatement := `SELECT * FROM insert WHERE `+key+` LIKE '%`+value+`'`
+	sqlStatement := `SELECT * FROM insert WHERE `+key+` LIKE '%`+value+`%'`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

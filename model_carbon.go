@@ -20,7 +20,7 @@ type carbon struct {
 }
 
 func findCarbonFiles(db *sql.DB, key string, value string) ([]carbon, error) {
-	sqlStatement := `SELECT id, carbon_id, send_id, date, file_name, language, extension, size, sha1, duration FROM carbon WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT id, carbon_id, send_id, date, file_name, language, extension, size, sha1, duration FROM carbon WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

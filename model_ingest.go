@@ -22,7 +22,7 @@ type ingest struct {
 }
 
 func findIngest(db *sql.DB, key string, value string) ([]ingest, error) {
-	sqlStatement := `SELECT * FROM ingest WHERE `+key+` LIKE '%`+value+`' ORDER BY id`
+	sqlStatement := `SELECT * FROM ingest WHERE `+key+` LIKE '%`+value+`%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
