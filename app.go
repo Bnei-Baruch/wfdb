@@ -12,14 +12,16 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
 	_ "github.com/lib/pq"
+	_ "github.com/denisenkom/go-mssqldb"
 )
 
 type App struct {
 	Router *mux.Router
 	DB     *sql.DB
+	MSDB	*sql.DB
 }
 
-func (a *App) Initialize(user, password, dbname string) {
+func (a *App) Initialize(user string, password string, dbname string, host string, user_id string, pass string) {
 	connectionString :=
 		fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
 
@@ -28,6 +30,14 @@ func (a *App) Initialize(user, password, dbname string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	conString := fmt.Sprintf("server=%s;user id=%s;password=%s;encrypt=disable;", host, user_id, pass)
+	a.MSDB, err = sql.Open("mssql", conString)
+	if err  != nil {
+		fmt.Println("  Error open db:", err.Error())
+	}
+
+	//defer a.MSDB.Close()
 
 	a.Router = mux.NewRouter()
 	a.initializeRoutes()
@@ -42,6 +52,7 @@ func (a *App) Run(addr string) {
 }
 
 func (a *App) initializeRoutes() {
+	a.Router.HandleFunc("/metus/find", a.findMetus).Methods("GET")
 	// Capture
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.postCaptureID).Methods("PUT")
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}/wfstatus/{jsonb}", a.postCaptureValue).Methods("POST")
