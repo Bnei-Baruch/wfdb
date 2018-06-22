@@ -7,7 +7,7 @@ import (
 )
 
 type metus struct {
-	ID    int			`json:"id"`
+	MetusID    int		`json:"metus_id"`
 	FileName  string  	`json:"filename"`
 	UPath  string  		`json:"unix_path"`
 	WPath  string  		`json:"windows_path"`
@@ -29,24 +29,24 @@ func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
 
 	for rows.Next() {
 		var c metus
-		if err := rows.Scan(&c.ID); err != nil {
+		if err := rows.Scan(&c.MetusID); err != nil {
 			return nil, err
 		}
 		//fmt.Println("  Select db:", c.ID)
 
-		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=2028", c.ID).Scan(&c.FileName)
+		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=2028", c.MetusID).Scan(&c.FileName)
 		if err != nil {
 			return nil, err
 		}
-		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1033", c.ID).Scan(&c.WPath)
+		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1033", c.MetusID).Scan(&c.WPath)
 		if err != nil {
 			return nil, err
 		}
-		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1034", c.ID).Scan(&c.UPath)
+		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1034", c.MetusID).Scan(&c.UPath)
 		if err != nil {
 			return nil, err
 		}
-		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1009", c.ID).Scan(&c.Title)
+		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1009", c.MetusID).Scan(&c.Title)
 		if err != nil {
 			return nil, err
 		}
