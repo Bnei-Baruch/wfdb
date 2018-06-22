@@ -4,6 +4,7 @@ package main
 
 import (
 	"database/sql"
+	"strings"
 )
 
 type metus struct {
@@ -42,10 +43,16 @@ func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
 		if err != nil {
 			return nil, err
 		}
+		c.WPath = strings.Replace(c.WPath, "\\\\", "\\", -1)
+
 		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1034", c.MetusID).Scan(&c.UPath)
 		if err != nil {
 			return nil, err
 		}
+		c.UPath = strings.Replace(c.UPath, "\\", "/", -1)
+		c.UPath = strings.Replace(c.UPath, ":", "-", -1)
+		c.UPath = "/mnt/metus/" + strings.Replace(c.UPath, "/", "", 1)
+
 		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1009", c.MetusID).Scan(&c.Title)
 		if err != nil {
 			return nil, err
