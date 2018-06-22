@@ -21,7 +21,7 @@ type App struct {
 	MSDB	*sql.DB
 }
 
-func (a *App) Initialize(user string, password string, dbname string, host string, user_id string, pass string) {
+func (a *App) Initialize(user string, password string, dbname string, host string, user_id string, pass string, name string) {
 	connectionString :=
 		fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
 
@@ -31,7 +31,7 @@ func (a *App) Initialize(user string, password string, dbname string, host strin
 		log.Fatal(err)
 	}
 
-	conString := fmt.Sprintf("server=%s;user id=%s;password=%s;encrypt=disable;", host, user_id, pass)
+	conString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;encrypt=disable;", host, user_id, pass, name)
 	a.MSDB, err = sql.Open("mssql", conString)
 	if err  != nil {
 		fmt.Println("  Error open db:", err.Error())

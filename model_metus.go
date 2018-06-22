@@ -4,18 +4,18 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type metus struct {
 	ID    int			`json:"id"`
 	FileName  string  	`json:"filename"`
 	UPath  string  		`json:"unix_path"`
+	WPath  string  		`json:"windows_path"`
 	Title  string  		`json:"title"`
 }
 
 func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
-	sqlStatement := `SELECT DISTINCT ObjectID FROM METADATA_0 WHERE Value_String LIKE '%`+value+`%'`
+	sqlStatement := `SELECT DISTINCT ObjectID FROM METADATA_0 WHERE Value_String LIKE '%`+value+`%' AND FieldID=2028`
 
 	rows, err := db.Query(sqlStatement)
 
@@ -32,9 +32,13 @@ func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
 		if err := rows.Scan(&c.ID); err != nil {
 			return nil, err
 		}
-		fmt.Println("  Select db:", c.ID)
+		//fmt.Println("  Select db:", c.ID)
 
 		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=2028", c.ID).Scan(&c.FileName)
+		if err != nil {
+			return nil, err
+		}
+		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1033", c.ID).Scan(&c.WPath)
 		if err != nil {
 			return nil, err
 		}
