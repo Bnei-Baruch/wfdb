@@ -5,6 +5,10 @@ package main
 import (
 	"database/sql"
 	"strings"
+	"os"
+	"crypto/sha1"
+	"io"
+	"encoding/hex"
 )
 
 type metus struct {
@@ -13,6 +17,7 @@ type metus struct {
 	UPath  string  		`json:"unix_path"`
 	WPath  string  		`json:"windows_path"`
 	Title  string  		`json:"title"`
+	Sha1  string  		`json:"sha1"`
 }
 
 func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
@@ -56,6 +61,21 @@ func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
 		err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1009", c.MetusID).Scan(&c.Title)
 		if err != nil {
 			return nil, err
+		}
+
+		if(key == "sha1") {
+
+			f, err := os.Open(c.UPath)
+			if err != nil {
+				return nil, err
+			}
+
+			h := sha1.New()
+			if _, err := io.Copy(h, f); err != nil {
+				return nil, err
+			}
+
+			c.Sha1 = hex.EncodeToString(h.Sum(nil))
 		}
 		objects = append(objects, c)
 	}
