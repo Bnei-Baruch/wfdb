@@ -53,6 +53,7 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/metus/find", a.findMetus).Methods("GET")
+	a.Router.HandleFunc("/metus/{id:[0-9]+}", a.getMetusByID).Methods("GET")
 	// Capture
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.postCaptureID).Methods("PUT")
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}/wfstatus/{jsonb}", a.postCaptureValue).Methods("POST")
