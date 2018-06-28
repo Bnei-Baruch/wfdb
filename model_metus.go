@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"fmt"
 	"encoding/json"
-	//"path"
+
 )
 
 type metus struct {
@@ -22,6 +22,7 @@ type metus struct {
 	WPath		string  	`json:"windows_path"`
 	Title		string  	`json:"title"`
 	Sha1		string  	`json:"sha1"`
+	Size 		float64		`json:"size"`
 	Language	string		`json:"language"`
 	Height		string		`json:"height"`
 	Width		string		`json:"width"`
@@ -122,6 +123,11 @@ func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
 		return err
 	}
 
+	err = db.QueryRow("SELECT Value_Number FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1032", MetusID).Scan(&c.Size)
+	if err != nil {
+		return err
+	}
+
 	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1033", MetusID).Scan(&c.WPath)
 	if err != nil {
 		return err
@@ -146,9 +152,9 @@ func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
 		return err
 	}
 
-	//err = c.getJSON("http://wfrp.bbdomain.org:8080/aricha/find?key=file_name&value="+strings.TrimSuffix(c.FileName,path.Ext(c.FileName)))
+	//err = c.getJSON("http://wfrp.bbdomain.org:8080/insert/find?key=file_name&value="+strings.TrimSuffix(c.FileName,path.Ext(c.FileName)))
 	//if err != nil {
-	//	return nil, err
+	//	return err
 	//}
 
 	if(key == "sha1") {
@@ -164,6 +170,11 @@ func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
 		}
 
 		c.Sha1 = hex.EncodeToString(h.Sum(nil))
+
+		err = c.getJSON("http://wfrp.bbdomain.org:8080/insert/find?key=insert_name&value="+c.FileName)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
