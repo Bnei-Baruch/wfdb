@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"encoding/json"
 
+	"strconv"
 )
 
 type metus struct {
@@ -32,7 +33,7 @@ type metus struct {
 	Format		string		`json:"format"`
 	Collection	string		`json:"collection"`
 	Type		string		`json:"type"`
-	Desc		string		`json:"desc"`
+	Descr		string		`json:"desc"`
 	Workflow []interface{} `json:"workflow"`
 }
 
@@ -67,90 +68,35 @@ func findMetus(db *sql.DB, key string, value string) ([]metus, error) {
 }
 
 func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
-	//var db *sql.DB
-	err := db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1134", MetusID).Scan(&c.Height)
+
+	id := strconv.Itoa(MetusID)
+
+	q := `SELECT (SELECT Value_String AS Height FROM dbo.METADATA_0 WHERE FieldID=1134 AND ObjectID=`+id+`) Height,
+		(SELECT Value_String AS Collection FROM dbo.METADATA_0 WHERE FieldID=1000060 AND ObjectID=`+id+`) Collection,
+		(SELECT Value_String AS Type FROM dbo.METADATA_0 WHERE FieldID=1000054 AND ObjectID=`+id+`) Type,
+		(SELECT Value_String AS Descr FROM dbo.METADATA_0 WHERE FieldID=1000055 AND ObjectID=`+id+`) Descr,
+		(SELECT Value_String AS Width FROM dbo.METADATA_0 WHERE FieldID=1133 AND ObjectID=`+id+`) Width,
+		(SELECT Value_String AS Aspect FROM dbo.METADATA_0 WHERE FieldID=1082 AND ObjectID=`+id+`) Aspect,
+		(SELECT Value_String AS Format FROM dbo.METADATA_0 WHERE FieldID=1142 AND ObjectID=`+id+`) Format,
+		(SELECT Value_String AS Original FROM dbo.METADATA_0 WHERE FieldID=1000049 AND ObjectID=`+id+`) Original,
+		(SELECT Value_String AS Lecturer FROM dbo.METADATA_0 WHERE FieldID=1000050 AND ObjectID=`+id+`) Lecturer,
+		(SELECT Value_String AS FileName FROM dbo.METADATA_0 WHERE FieldID=2028 AND ObjectID=`+id+`) FileName,
+		(SELECT Value_Number AS Size FROM dbo.METADATA_0 WHERE FieldID=1032 AND ObjectID=`+id+`) Size,
+		(SELECT Value_String AS WPath FROM dbo.METADATA_0 WHERE FieldID=1033 AND ObjectID=`+id+`) WPath,
+		(SELECT Value_String AS UPath FROM dbo.METADATA_0 WHERE FieldID=1034 AND ObjectID=`+id+`) UPath,
+		(SELECT Value_String AS Title FROM dbo.METADATA_0 WHERE FieldID=1009 AND ObjectID=`+id+`) Title,
+		(SELECT Value_String AS Language FROM dbo.METADATA_0 WHERE FieldID=1045 AND ObjectID=`+id+`) Language;`
+
+	err := db.QueryRow(q).Scan(&c.Height, &c.Collection, &c.Type, &c.Descr, &c.Width, &c.Aspect, &c.Format, &c.Original, &c.Lecturer, &c.FileName, &c.Size, &c.WPath, &c.UPath, &c.Title, &c.Language)
+
 	if err != nil {
 		return err
 	}
 
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1000060", MetusID).Scan(&c.Collection)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1000054", MetusID).Scan(&c.Type)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1000055", MetusID).Scan(&c.Desc)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1133", MetusID).Scan(&c.Width)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1082", MetusID).Scan(&c.Aspect)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1142", MetusID).Scan(&c.Format)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1000049", MetusID).Scan(&c.Original)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1000050", MetusID).Scan(&c.Lecturer)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1133", MetusID).Scan(&c.Width)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=2028", MetusID).Scan(&c.FileName)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_Number FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1032", MetusID).Scan(&c.Size)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1033", MetusID).Scan(&c.WPath)
-	if err != nil {
-		return err
-	}
 	c.WPath = strings.Replace(c.WPath, "\\\\", "\\", -1)
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1034", MetusID).Scan(&c.UPath)
-	if err != nil {
-		return err
-	}
 	c.UPath = strings.Replace(c.UPath, "\\", "/", -1)
 	c.UPath = strings.Replace(c.UPath, ":", "-", -1)
 	c.UPath = "/mnt/metus/" + strings.Replace(c.UPath, "/", "", 1)
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1009", MetusID).Scan(&c.Title)
-	if err != nil {
-		return err
-	}
-
-	err = db.QueryRow("SELECT Value_String FROM dbo.METADATA_0 WHERE ObjectID=$1 AND FieldID=1045", MetusID).Scan(&c.Language)
-	if err != nil {
-		return err
-	}
 
 	//err = c.getJSON("http://wfrp.bbdomain.org:8080/insert/find?key=file_name&value="+strings.TrimSuffix(c.FileName,path.Ext(c.FileName)))
 	//if err != nil {
