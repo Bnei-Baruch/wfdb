@@ -25,12 +25,8 @@ type metus struct {
 	Sha1		string  	`json:"sha1"`
 	Size 		float64		`json:"size"`
 	Language	string		`json:"language"`
-	Height		string		`json:"height"`
-	Width		string		`json:"width"`
 	Original	string		`json:"original"`
-	Aspect		string		`json:"aspect"`
 	Lecturer	string		`json:"lecturer"`
-	Format		string		`json:"format"`
 	Collection	string		`json:"collection"`
 	Type		string		`json:"type"`
 	Descr		string		`json:"desc"`
@@ -71,13 +67,10 @@ func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
 
 	id := strconv.Itoa(MetusID)
 
-	q := `SELECT (SELECT Value_String AS Height FROM dbo.METADATA_0 WHERE FieldID=1134 AND ObjectID=`+id+`) Height,
+	q := `SELECT 
 		(SELECT Value_String AS Collection FROM dbo.METADATA_0 WHERE FieldID=1000060 AND ObjectID=`+id+`) Collection,
 		(SELECT Value_String AS Type FROM dbo.METADATA_0 WHERE FieldID=1000054 AND ObjectID=`+id+`) Type,
 		(SELECT Value_String AS Descr FROM dbo.METADATA_0 WHERE FieldID=1000055 AND ObjectID=`+id+`) Descr,
-		(SELECT Value_String AS Width FROM dbo.METADATA_0 WHERE FieldID=1133 AND ObjectID=`+id+`) Width,
-		(SELECT Value_String AS Aspect FROM dbo.METADATA_0 WHERE FieldID=1082 AND ObjectID=`+id+`) Aspect,
-		(SELECT Value_String AS Format FROM dbo.METADATA_0 WHERE FieldID=1142 AND ObjectID=`+id+`) Format,
 		(SELECT Value_String AS Original FROM dbo.METADATA_0 WHERE FieldID=1000049 AND ObjectID=`+id+`) Original,
 		(SELECT Value_String AS Lecturer FROM dbo.METADATA_0 WHERE FieldID=1000050 AND ObjectID=`+id+`) Lecturer,
 		(SELECT Value_String AS FileName FROM dbo.METADATA_0 WHERE FieldID=2028 AND ObjectID=`+id+`) FileName,
@@ -87,7 +80,7 @@ func (c *metus) getMetusMeta(db *sql.DB, MetusID int, key string) error {
 		(SELECT Value_String AS Title FROM dbo.METADATA_0 WHERE FieldID=1009 AND ObjectID=`+id+`) Title,
 		(SELECT Value_String AS Language FROM dbo.METADATA_0 WHERE FieldID=1045 AND ObjectID=`+id+`) Language;`
 
-	err := db.QueryRow(q).Scan(&c.Height, &c.Collection, &c.Type, &c.Descr, &c.Width, &c.Aspect, &c.Format, &c.Original, &c.Lecturer, &c.FileName, &c.Size, &c.WPath, &c.UPath, &c.Title, &c.Language)
+	err := db.QueryRow(q).Scan(&c.Collection, &c.Type, &c.Descr, &c.Original, &c.Lecturer, &c.FileName, &c.Size, &c.WPath, &c.UPath, &c.Title, &c.Language)
 
 	if err != nil {
 		return err
