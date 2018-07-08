@@ -31,13 +31,25 @@ func (a *App) findTrimmerByJSON(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	files, err := findTrimmerByJSON(a.DB, ep, key, value)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	if(ep == "sha1") {
 
-	respondWithJSON(w, http.StatusOK, files)
+		files, err := findTrimmerBySHA1(a.DB, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
+	} else {
+
+		files, err := findTrimmerByJSON(a.DB, ep, key, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
+	}
 }
 
 func (a *App) getTrimmer(w http.ResponseWriter, r *http.Request) {
