@@ -63,6 +63,24 @@ func (a *App) getCaptureID(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, c)
 }
 
+func (a *App) getCassetteID(w http.ResponseWriter, r *http.Request) {
+	var c capture
+	vars := mux.Vars(r)
+	c.StopName = vars["id"]
+
+	if err := c.getCassetteID(a.DB); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Not Found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, c)
+}
+
 func (a *App) postCaptureID(w http.ResponseWriter, r *http.Request) {
 	var c capture
 	vars := mux.Vars(r)

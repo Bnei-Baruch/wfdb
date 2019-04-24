@@ -59,6 +59,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}/wfstatus/{jsonb}", a.postCaptureValue).Methods("POST")
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}/{jsonb}", a.postCaptureJSON).Methods("POST")
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.getCaptureID).Methods("GET")
+	a.Router.HandleFunc("/capture/{id:[0-9]+}", a.getCassetteID).Methods("GET")
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.deleteCaptureID).Methods("DELETE")
 	a.Router.HandleFunc("/capture", a.getCapture).Methods("GET")
 	a.Router.HandleFunc("/capture/find", a.findCapture).Methods("GET")

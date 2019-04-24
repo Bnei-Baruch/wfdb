@@ -99,6 +99,27 @@ func (c *capture) getCaptureID(db *sql.DB) error {
 	return err
 }
 
+func (c *capture) getCassetteID(db *sql.DB) error {
+	var line []byte
+	var original []byte
+	var proxy []byte
+	var wfstatus []byte
+
+	err := db.QueryRow("SELECT * FROM capture WHERE stop_name = $1",
+		c.StopName).Scan(&c.ID, &c.CaptureID, &c.Capsrc, &c.Date, &c.StartName, &c.StopName, &c.Sha1, &line, &original, &proxy, &wfstatus)
+
+	json.Unmarshal(line, &c.Line)
+	json.Unmarshal(original, &c.Original)
+	json.Unmarshal(proxy, &c.Proxy)
+	json.Unmarshal(wfstatus, &c.Wfstatus)
+
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
 func (c *capture) postCaptureID(db *sql.DB) error {
 	line, _ := json.Marshal(c.Line)
 	original, _ := json.Marshal(c.Original)
