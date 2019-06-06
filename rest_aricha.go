@@ -31,13 +31,26 @@ func (a *App) findArichaByJSON(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	files, err := findArichaByJSON(a.DB, ep, key, value)
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
+	if(ep == "sha1") {
+
+		files, err := findArichaBySHA1(a.DB, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
+	} else {
+
+		files, err := findArichaByJSON(a.DB, ep, key, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
 	}
 
-	respondWithJSON(w, http.StatusOK, files)
 }
 
 func (a *App) getAricha(w http.ResponseWriter, r *http.Request) {

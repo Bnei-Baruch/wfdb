@@ -82,6 +82,39 @@ func findArichaByJSON(db *sql.DB, ep string, key string, value string) ([]aricha
 	return objects, nil
 }
 
+func findArichaBySHA1(db *sql.DB, value string) ([]aricha, error) {
+
+	sqlStatement := fmt.Sprintf("SELECT id, aricha_id, date, file_name, parent, line, original, proxy, wfstatus FROM aricha WHERE original->'format'->>'sha1' = '%s' ORDER BY aricha_id;", value)
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	objects := []aricha{}
+
+	for rows.Next() {
+		var t aricha
+		var parent, line, original, proxy, wfstatus []byte
+		if err := rows.Scan(&t.ID, &t.ArichaID, &t.Date, &t.FileName, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(parent, &t.Parent)
+		json.Unmarshal(line, &t.Line)
+		json.Unmarshal(original, &t.Original)
+		json.Unmarshal(proxy, &t.Proxy)
+		json.Unmarshal(wfstatus, &t.Wfstatus)
+		objects = append(objects, t)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return objects, nil
+}
+
 
 func getAricha(db *sql.DB, start, count int) ([]aricha, error) {
 	rows, err := db.Query(
