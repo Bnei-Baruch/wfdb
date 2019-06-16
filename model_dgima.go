@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/lib/pq"
 )
 
@@ -48,6 +49,76 @@ func findDgima(db *sql.DB, key string, value string) ([]dgima, error) {
 		json.Unmarshal(proxy, &d.Proxy)
 		json.Unmarshal(wfstatus, &d.Wfstatus)
 		objects = append(objects, d)
+	}
+
+	return objects, nil
+}
+
+func findDgimaByJSON(db *sql.DB, ep string, key string, value string) ([]dgima, error) {
+
+	sqlStatement := fmt.Sprintf("SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE %s ->> '%s' = '%s' ORDER BY dgima_id;", ep, key, value)
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	objects := []dgima{}
+
+	for rows.Next() {
+		var d dgima
+		var inpoints, outpoints, parent, line, original, proxy, wfstatus []byte
+		if err := rows.Scan(&d.ID, &d.DgimaID, &d.Date, &d.FileName, &inpoints, &outpoints, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(inpoints, &d.Inpoints)
+		json.Unmarshal(outpoints, &d.Outpoints)
+		json.Unmarshal(parent, &d.Parent)
+		json.Unmarshal(line, &d.Line)
+		json.Unmarshal(original, &d.Original)
+		json.Unmarshal(proxy, &d.Proxy)
+		json.Unmarshal(wfstatus, &d.Wfstatus)
+		objects = append(objects, d)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return objects, nil
+}
+
+func findDgimaBySHA1(db *sql.DB, value string) ([]dgima, error) {
+
+	sqlStatement := fmt.Sprintf("SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE original->'format'->>'sha1' = '%s' ORDER BY dgima_id;", value)
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	objects := []dgima{}
+
+	for rows.Next() {
+		var d dgima
+		var inpoints, outpoints, parent, line, original, proxy, wfstatus []byte
+		if err := rows.Scan(&d.ID, &d.DgimaID, &d.Date, &d.FileName, &inpoints, &outpoints, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(inpoints, &d.Inpoints)
+		json.Unmarshal(outpoints, &d.Outpoints)
+		json.Unmarshal(parent, &d.Parent)
+		json.Unmarshal(line, &d.Line)
+		json.Unmarshal(original, &d.Original)
+		json.Unmarshal(proxy, &d.Proxy)
+		json.Unmarshal(wfstatus, &d.Wfstatus)
+		objects = append(objects, d)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return objects, nil

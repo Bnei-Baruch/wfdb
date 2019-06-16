@@ -25,6 +25,33 @@ func (a *App) findDgima(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) findDgimaByJSON(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	ep := vars["jsonb"]
+	key := r.FormValue("key")
+	value := r.FormValue("value")
+
+	if(ep == "sha1") {
+
+		files, err := findDgimaBySHA1(a.DB, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
+	} else {
+
+		files, err := findDgimaByJSON(a.DB, ep, key, value)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJSON(w, http.StatusOK, files)
+
+	}
+}
+
 func (a *App) getDgima(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))

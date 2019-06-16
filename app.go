@@ -114,6 +114,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/dgima/{id:d[0-9]+}", a.deleteDgimaID).Methods("DELETE")
 	a.Router.HandleFunc("/dgima", a.getDgima).Methods("GET")
 	a.Router.HandleFunc("/dgima/find", a.findDgima).Methods("GET")
+	a.Router.HandleFunc("/dgima/{jsonb}", a.findDgimaByJSON).Methods("GET")
 	// Trimmer
 	a.Router.HandleFunc("/trim", a.getFilesToTrim).Methods("GET")
 	a.Router.HandleFunc("/trimmer/{id:t[0-9]+}", a.postTrimmerID).Methods("PUT")
