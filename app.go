@@ -95,6 +95,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/insert/{id:i[0-9]+}", a.deleteInsertFile).Methods("DELETE")
 	a.Router.HandleFunc("/insert", a.getInsertFiles).Methods("GET")
 	a.Router.HandleFunc("/insert/find", a.findInsertFiles).Methods("GET")
+	a.Router.HandleFunc("/insert/line", a.findInsertByJSON).Methods("GET")
 	// Ingest
 	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.postIngestID).Methods("PUT")
 	a.Router.HandleFunc("/ingest/{id:c[0-9]+}/wfstatus/{jsonb}", a.postIngestValue).Methods("POST")
@@ -124,7 +125,6 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/trimmer", a.getTrimmer).Methods("GET")
 	a.Router.HandleFunc("/trimmer/find", a.findTrimmer).Methods("GET")
 	a.Router.HandleFunc("/trimmer/{jsonb}", a.findTrimmerByJSON).Methods("GET")
-
 	// Aricha
 	a.Router.HandleFunc("/aricha/{id:a[0-9]+}", a.postArichaID).Methods("PUT")
 	a.Router.HandleFunc("/aricha/{id:a[0-9]+}/wfstatus/{jsonb}", a.postArichaValue).Methods("POST")

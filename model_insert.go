@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 )
 
 type insert struct {
@@ -43,6 +44,35 @@ func findInsertFiles(db *sql.DB, key string, value string) ([]insert, error) {
 		}
 		json.Unmarshal(obj, &i.Line)
 		files = append(files, i)
+	}
+
+	return files, nil
+}
+
+func findInsertByJSON(db *sql.DB, key string, value string) ([]insert, error) {
+
+	sqlStatement := fmt.Sprintf("SELECT * FROM insert WHERE line ->> '%s' = '%s' ORDER BY insert_id;", key, value)
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	files := []insert{}
+
+	for rows.Next() {
+		var i insert
+		var obj []byte
+		if err := rows.Scan(&i.ID, &i.InsertID, &i.InsertName, &i.Date, &i.FileName, &i.Extension, &i.Size, &i.Sha1, &i.Language, &i.InsertType, &i.SendID, &i.UploadType, &obj); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(obj, &i.Line)
+		files = append(files, i)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return files, nil

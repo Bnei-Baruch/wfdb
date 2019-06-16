@@ -25,6 +25,18 @@ func (a *App) findInsertFiles(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) findInsertByJSON(w http.ResponseWriter, r *http.Request) {
+	key := r.FormValue("key")
+	value := r.FormValue("value")
+
+	files, err := findInsertByJSON(a.DB, key, value)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJSON(w, http.StatusOK, files)
+}
+
 func (a *App) getInsertFiles(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
