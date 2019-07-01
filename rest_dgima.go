@@ -83,6 +83,20 @@ func (a *App) getFilesToDgima(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) getDgimaBySource(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	v := vars["id"]
+
+	files, err := getDgimaBySource(a.DB, v)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, files)
+}
+
 func (a *App) getDgimaID(w http.ResponseWriter, r *http.Request) {
 	var d dgima
 	vars := mux.Vars(r)

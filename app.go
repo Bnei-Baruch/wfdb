@@ -106,6 +106,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/ingest/find", a.findIngest).Methods("GET")
 	// Dgima
 	a.Router.HandleFunc("/drim", a.getFilesToDgima).Methods("GET")
+	a.Router.HandleFunc("/drim/{id}", a.getDgimaBySource).Methods("GET")
 	a.Router.HandleFunc("/dgima/{id:d[0-9]+}", a.postDgimaID).Methods("PUT")
 	a.Router.HandleFunc("/dgima/{id:d[0-9]+}/wfstatus/{jsonb}", a.postDgimaValue).Methods("POST")
 	a.Router.HandleFunc("/dgima/{id:d[0-9]+}/{jsonb}", a.postDgimaJSON).Methods("POST")

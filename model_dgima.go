@@ -157,6 +157,38 @@ func getDgima(db *sql.DB, start, count int) ([]dgima, error) {
 	return objects, nil
 }
 
+func getDgimaBySource(db *sql.DB, value string) ([]dgima, error) {
+	rows, err := db.Query(
+		"SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE wfstatus ->> 'removed' = 'false' AND parent ->> 'source' = $1 ORDER BY dgima_id", value)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	objects := []dgima{}
+
+	for rows.Next() {
+		var d dgima
+		var inpoints, outpoints, parent, line, original, proxy, wfstatus []byte
+
+		if err := rows.Scan(&d.ID, &d.DgimaID, &d.Date, &d.FileName, &inpoints, &outpoints, &parent, &line, &original, &proxy, &wfstatus); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(inpoints, &d.Inpoints)
+		json.Unmarshal(outpoints, &d.Outpoints)
+		json.Unmarshal(parent, &d.Parent)
+		json.Unmarshal(line, &d.Line)
+		json.Unmarshal(original, &d.Original)
+		json.Unmarshal(proxy, &d.Proxy)
+		json.Unmarshal(wfstatus, &d.Wfstatus)
+		objects = append(objects, d)
+	}
+
+	return objects, nil
+}
+
 func getFilesToDgima(db *sql.DB) ([]dgima, error) {
 	rows, err := db.Query(
 		"SELECT id, dgima_id, date, file_name, array_to_json(inpoints), array_to_json(outpoints), parent, line, original, proxy, wfstatus FROM dgima WHERE wfstatus ->> 'removed' = 'false' ORDER BY dgima_id")
