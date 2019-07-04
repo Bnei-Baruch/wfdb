@@ -144,6 +144,23 @@ wfstatus jsonb,
 CONSTRAINT aricha_pkey PRIMARY KEY (aricha_id)
 )`
 
+const createJobsTable = `CREATE TABLE IF NOT EXISTS jobs
+(
+id BIGSERIAL,
+job_id TEXT NOT NULL,
+date VARCHAR(10),
+file_name TEXT,
+job_name TEXT,
+job_type TEXT NOT NULL,
+parent jsonb,
+line jsonb,
+original jsonb,
+proxy jsonb,
+product jsonb,
+wfstatus jsonb,
+CONSTRAINT job_pkey PRIMARY KEY (job_id)
+)`
+
 const createArchiveTable = `CREATE TABLE IF NOT EXISTS archive
 (
 id BIGSERIAL,

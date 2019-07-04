@@ -138,6 +138,17 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/bdika", a.getBdika).Methods("GET")
 	a.Router.HandleFunc("/aricha/find", a.findAricha).Methods("GET")
 	a.Router.HandleFunc("/aricha/{jsonb}", a.findArichaByJSON).Methods("GET")
+	// Jobs
+	a.Router.HandleFunc("/jobs/{id:j[0-9]+}", a.postJobID).Methods("PUT")
+	a.Router.HandleFunc("/jobs/{id:j[0-9]+}/wfstatus/{jsonb}", a.postJobValue).Methods("POST")
+	a.Router.HandleFunc("/jobs/{id:j[0-9]+}/{jsonb}", a.postJobJSON).Methods("POST")
+	a.Router.HandleFunc("/jobs/{id:j[0-9]+}", a.getJobID).Methods("GET")
+	a.Router.HandleFunc("/jobs/{id:[0-9]+}", a.getJobByID).Methods("GET")
+	a.Router.HandleFunc("/jobs/{id:j[0-9]+}", a.deleteJobID).Methods("DELETE")
+	a.Router.HandleFunc("/jobs_list", a.getListJobs).Methods("GET")
+	a.Router.HandleFunc("/jobs", a.getActiveJobs).Methods("GET")
+	a.Router.HandleFunc("/jobs/find", a.findJob).Methods("GET")
+	a.Router.HandleFunc("/jobs/{jsonb}", a.findJobByJSON).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
 	// Labels
