@@ -206,7 +206,7 @@ func (t *jobs) getJobID(db *sql.DB) error {
 func (t *jobs) getJobByID(db *sql.DB) error {
 	var parent, line, original, proxy, product, wfstatus []byte
 
-	err := db.QueryRow("SELECT id, job_id, date, file_name, ,job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE id = $1",
+	err := db.QueryRow("SELECT id, job_id, date, file_name,job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE id = $1",
 		t.ID).Scan(&t.ID, &t.JobID, &t.Date, &t.FileName, &t.FileName, &t.JobName, &parent, &line, &original, &proxy, &product, &wfstatus)
 
 	json.Unmarshal(parent, &t.Parent)
