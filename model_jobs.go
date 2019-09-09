@@ -9,22 +9,22 @@ import (
 )
 
 type jobs struct {
-	ID    int							`json:"id"`
-	JobID  string 					 	`json:"job_id"`
-	Date string							`json:"date"`
-	FileName string						`json:"file_name"`
-	JobName string						`json:"job_name"`
-	JobType string						`json:"job_type"`
-	Parent map[string]interface{}		`json:"parent"`
-	Line map[string]interface{}			`json:"line"`
-	Original map[string]interface{}		`json:"original"`
-	Proxy map[string]interface{}		`json:"proxy"`
-	Product map[string]interface{}		`json:"product"`
-	Wfstatus map[string]interface{}		`json:"wfstatus"`
+	ID       int                    `json:"id"`
+	JobID    string                 `json:"job_id"`
+	Date     string                 `json:"date"`
+	FileName string                 `json:"file_name"`
+	JobName  string                 `json:"job_name"`
+	JobType  string                 `json:"job_type"`
+	Parent   map[string]interface{} `json:"parent"`
+	Line     map[string]interface{} `json:"line"`
+	Original map[string]interface{} `json:"original"`
+	Proxy    map[string]interface{} `json:"proxy"`
+	Product  map[string]interface{} `json:"product"`
+	Wfstatus map[string]interface{} `json:"wfstatus"`
 }
 
 func findJob(db *sql.DB, key string, value string) ([]jobs, error) {
-	sqlStatement := `SELECT * FROM jobs WHERE `+key+` LIKE '%`+value+`%' ORDER BY job_id`
+	sqlStatement := `SELECT * FROM jobs WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY job_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -121,7 +121,6 @@ func findJobBySHA1(db *sql.DB, value string) ([]jobs, error) {
 	return objects, nil
 }
 
-
 func getListJobs(db *sql.DB, start, count int) ([]jobs, error) {
 	rows, err := db.Query(
 		"SELECT * FROM jobs ORDER BY job_id DESC LIMIT $1 OFFSET $2",
@@ -186,9 +185,8 @@ func getActiveJobs(db *sql.DB) ([]jobs, error) {
 func (t *jobs) getJobID(db *sql.DB) error {
 	var parent, line, original, proxy, product, wfstatus []byte
 
-	err := db.QueryRow("SELECT id, job_id, date, file_name,job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE job_id = $1",
-		t.JobID).Scan(&t.ID, &t.JobID, &t.Date, &t.FileName, &t.FileName, &t.JobName, &parent, &line, &original, &proxy, &product, &wfstatus)
-
+	err := db.QueryRow("SELECT id, job_id, date, file_name, job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE job_id = $1",
+		t.JobID).Scan(&t.ID, &t.JobID, &t.Date, &t.FileName, &t.JobName, &t.JobType, &parent, &line, &original, &proxy, &product, &wfstatus)
 
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
@@ -206,8 +204,8 @@ func (t *jobs) getJobID(db *sql.DB) error {
 func (t *jobs) getJobByID(db *sql.DB) error {
 	var parent, line, original, proxy, product, wfstatus []byte
 
-	err := db.QueryRow("SELECT id, job_id, date, file_name,job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE id = $1",
-		t.ID).Scan(&t.ID, &t.JobID, &t.Date, &t.FileName, &t.FileName, &t.JobName, &parent, &line, &original, &proxy, &product, &wfstatus)
+	err := db.QueryRow("SELECT id, job_id, date, file_name, job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE id = $1",
+		t.ID).Scan(&t.ID, &t.JobID, &t.Date, &t.FileName, &t.JobName, &t.JobType, &parent, &line, &original, &proxy, &product, &wfstatus)
 
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
@@ -244,7 +242,7 @@ func (t *jobs) postJobID(db *sql.DB) error {
 func (t *jobs) postJobJSON(db *sql.DB, jsonb interface{}, key string) error {
 	v, _ := json.Marshal(jsonb)
 
-	sqlStatement := `UPDATE jobs SET `+key+` = $2 WHERE job_id=$1;`
+	sqlStatement := `UPDATE jobs SET ` + key + ` = $2 WHERE job_id=$1;`
 	_, err := db.Exec(sqlStatement, t.JobID, v)
 
 	return err
