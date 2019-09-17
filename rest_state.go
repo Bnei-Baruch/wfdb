@@ -105,6 +105,50 @@ func (a *App) updateState(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) postStateValue(w http.ResponseWriter, r *http.Request) {
+	var s state
+	vars := mux.Vars(r)
+	s.StateID = vars["id"]
+	key := vars["jsonb"]
+	value := r.FormValue("value")
+	body := r.FormValue("body")
+
+	if value == "" {
+		if err := s.postStateValue(a.DB, body, key); err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	} else {
+		if err := s.postStateStatus(a.DB, value, key); err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func (a *App) postStateJSON(w http.ResponseWriter, r *http.Request) {
+	var s state
+	vars := mux.Vars(r)
+	s.StateID = vars["id"]
+	key := vars["jsonb"]
+	var value map[string]interface{}
+	d := json.NewDecoder(r.Body)
+
+	if err := d.Decode(&value); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+
+	if err := s.postStateJSON(a.DB, value, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func (a *App) deleteState(w http.ResponseWriter, r *http.Request) {
 	var s state
 	vars := mux.Vars(r)

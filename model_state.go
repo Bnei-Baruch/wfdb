@@ -100,6 +100,28 @@ func (s *state) updateState(db *sql.DB) error {
 	return err
 }
 
+func (s *state) postStateStatus(db *sql.DB, value, key string) error {
+	_, err := db.Exec("UPDATE state SET data = data || json_build_object($3::text, $2::bool)::jsonb WHERE state_id=$1",
+		s.StateID, value, key)
+
+	return err
+}
+
+func (s *state) postStateValue(db *sql.DB, value string, key string) error {
+	_, err := db.Exec("UPDATE state SET data = data || json_build_object($3::text, $2::text)::jsonb WHERE state_id=$1",
+		s.StateID, value, key)
+
+	return err
+}
+
+func (s *state) postStateJSON(db *sql.DB, value interface{}, key string) error {
+	v, _ := json.Marshal(value)
+	_, err := db.Exec("UPDATE state SET data = data || json_build_object($3::text, $2::jsonb)::jsonb WHERE state_id=$1",
+		s.StateID, v, key)
+
+	return err
+}
+
 func (s *state) deleteState(db *sql.DB) error {
 	_, err := db.Exec("DELETE FROM state WHERE state_id=$1", s.StateID)
 
