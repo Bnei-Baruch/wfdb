@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"."
+	"bytes"
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"encoding/json"
-	"bytes"
 	"strconv"
 )
 
@@ -84,7 +84,6 @@ wfstatus jsonb,
 CONSTRAINT ingest_pkey PRIMARY KEY (capture_id)
 )`
 
-
 const createStateTable = `CREATE TABLE IF NOT EXISTS state
 (
 id SERIAL,
@@ -108,6 +107,7 @@ proxy jsonb,
 wfstatus jsonb,
 CONSTRAINT trimmer_pkey PRIMARY KEY (trim_id)
 )`
+
 //parent_id TEXT NOT NULL,
 //parent_name TEXT,
 //parent_src TEXT,
@@ -224,6 +224,30 @@ send_id TEXT,
 upload_type TEXT NOT NULL,
 line jsonb NOT NULL,
 CONSTRAINT insert_pkey PRIMARY KEY (insert_id)
+)`
+
+const createUFilesTable = `CREATE TABLE IF NOT EXISTS files
+(
+id BIGSERIAL,
+file_id TEXT NOT NULL,
+file_name TEXT NOT NULL,
+date VARCHAR(10) NOT NULL,
+file_name VARCHAR NOT NULL,
+extension VARCHAR(10) NOT NULL,
+size BIGINT NOT NULL,
+sha1 VARCHAR(40) NOT NULL,
+file_type VARCHAR(1) NOT NULL,
+send_id TEXT,
+line jsonb NOT NULL,
+CONSTRAINT files_pkey PRIMARY KEY (file_id)
+)`
+
+const createUStateTable = `CREATE TABLE IF NOT EXISTS state
+(
+id BIGSERIAL,
+state_id TEXT NOT NULL,
+data jsonb NOT NULL,
+CONSTRAINT state_pkey PRIMARY KEY (state_id)
 )`
 
 func TestEmptyTable(t *testing.T) {

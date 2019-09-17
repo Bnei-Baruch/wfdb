@@ -9,16 +9,16 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/gorilla/handlers"
-	_ "github.com/lib/pq"
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	_ "github.com/lib/pq"
 )
 
 type App struct {
 	Router *mux.Router
 	DB     *sql.DB
-	MSDB	*sql.DB
+	MSDB   *sql.DB
 }
 
 func (a *App) Initialize(user string, password string, dbname string, host string, user_id string, pass string, name string) {
@@ -33,7 +33,7 @@ func (a *App) Initialize(user string, password string, dbname string, host strin
 
 	conString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;encrypt=disable;", host, user_id, pass, name)
 	a.MSDB, err = sql.Open("mssql", conString)
-	if err  != nil {
+	if err != nil {
 		fmt.Println("  Error open db:", err.Error())
 	}
 
@@ -63,13 +63,6 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/capture/{id:c[0-9]+}", a.deleteCaptureID).Methods("DELETE")
 	a.Router.HandleFunc("/capture", a.getCapture).Methods("GET")
 	a.Router.HandleFunc("/capture/find", a.findCapture).Methods("GET")
-	// State
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")
-	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("POST")
-	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getStateID).Methods("GET")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
-	a.Router.HandleFunc("/state", a.getState).Methods("GET")
 	// Archive
 	a.Router.HandleFunc("/archive/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postArFile).Methods("PUT")
 	a.Router.HandleFunc("/archive/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.updateArFile).Methods("POST")
@@ -149,6 +142,13 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/jobs", a.getActiveJobs).Methods("GET")
 	a.Router.HandleFunc("/jobs/find", a.findJob).Methods("GET")
 	a.Router.HandleFunc("/jobs/{jsonb}", a.findJobByJSON).Methods("GET")
+	// State
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")
+	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("POST")
+	//a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getStateID).Methods("GET")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
+	a.Router.HandleFunc("/state", a.getState).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
 	// Labels
