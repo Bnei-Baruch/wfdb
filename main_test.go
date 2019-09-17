@@ -230,7 +230,6 @@ const createUFilesTable = `CREATE TABLE IF NOT EXISTS files
 (
 id BIGSERIAL,
 file_id TEXT NOT NULL,
-file_name TEXT NOT NULL,
 date VARCHAR(10) NOT NULL,
 file_name VARCHAR NOT NULL,
 extension VARCHAR(10) NOT NULL,
@@ -239,7 +238,7 @@ sha1 VARCHAR(40) NOT NULL,
 file_type VARCHAR(1) NOT NULL,
 send_id TEXT,
 line jsonb NOT NULL,
-CONSTRAINT files_pkey PRIMARY KEY (file_id)
+CONSTRAINT files_pkey PRIMARY KEY (sha1)
 )`
 
 const createUStateTable = `CREATE TABLE IF NOT EXISTS state

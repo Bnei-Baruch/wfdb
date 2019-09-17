@@ -8,9 +8,9 @@ import (
 )
 
 type state struct {
-	ID    int						`json:"id"`
-	StateID  string  				`json:"state_id"`
-	Data map[string]interface{}		`json:"data"`
+	ID      int                    `json:"id"`
+	StateID string                 `json:"state_id"`
+	Data    map[string]interface{} `json:"data"`
 }
 
 func findStates(db *sql.DB, key string, value string) ([]state, error) {
@@ -81,7 +81,7 @@ func (s *state) postState(db *sql.DB) error {
 	v, _ := json.Marshal(s.Data)
 
 	err := db.QueryRow(
-		"INSERT INTO state(state_id, data) VALUES($1, $2) ON CONFLICT (state_id) DO UPDATE SET (data) = ($2) WHERE state.state_id = $1 RETURNING id",
+		"INSERT INTO state(state_id, data) VALUES($1, $2) ON CONFLICT (state_id) DO UPDATE SET data = $2 WHERE state.state_id = $1 RETURNING id",
 		s.StateID, v).Scan(&s.ID)
 
 	if err != nil {
