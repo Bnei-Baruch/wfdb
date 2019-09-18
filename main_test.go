@@ -108,12 +108,6 @@ wfstatus jsonb,
 CONSTRAINT trimmer_pkey PRIMARY KEY (trim_id)
 )`
 
-//parent_id TEXT NOT NULL,
-//parent_name TEXT,
-//parent_src TEXT,
-//parent_osha1 VARCHAR(40),
-//parent_psha1 VARCHAR(40),
-
 const createDgimaTable = `CREATE TABLE IF NOT EXISTS dgima
 (
 id BIGSERIAL,
@@ -235,7 +229,7 @@ file_name VARCHAR NOT NULL,
 extension VARCHAR(10) NOT NULL,
 size BIGINT NOT NULL,
 sha1 VARCHAR(40) NOT NULL,
-file_type VARCHAR(1) NOT NULL,
+file_type TEXT NOT NULL,
 send_id TEXT,
 line jsonb NOT NULL,
 CONSTRAINT files_pkey PRIMARY KEY (sha1)

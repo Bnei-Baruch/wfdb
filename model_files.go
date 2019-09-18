@@ -88,8 +88,8 @@ func (a *files) getFile(db *sql.DB) error {
 func (a *files) postFile(db *sql.DB) error {
 	line, _ := json.Marshal(a.Line)
 	err := db.QueryRow(
-		"INSERT INTO files(file_id, date, file_name, extension, size, sha1, file_type, send_id, line) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (file_id) DO UPDATE SET (file_id, date, file_name, extension, size, sha1, file_type, send_id, line) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE files.file_id = $1 RETURNING id",
-		a.ID, a.FileID, a.Date, a.FileName, a.Extension, a.Size, a.Sha1, a.FileType, a.SendID, line).Scan(&a.ID)
+		"INSERT INTO files(file_id, date, file_name, extension, size, sha1, file_type, send_id, line) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, file_name, extension, size, sha1, file_type, send_id, line) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE files.sha1 = $6 RETURNING id",
+		a.FileID, a.Date, a.FileName, a.Extension, a.Size, a.Sha1, a.FileType, a.SendID, line).Scan(&a.ID)
 
 	if err != nil {
 		return err
