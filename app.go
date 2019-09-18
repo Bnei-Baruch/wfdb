@@ -150,6 +150,14 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getState).Methods("GET")
 	a.Router.HandleFunc("/state", a.getStates).Methods("GET")
+	// Files
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postFile).Methods("PUT")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.getFile).Methods("GET")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.deleteFile).Methods("DELETE")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.postFileJSON).Methods("PUT")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.postFileValue).Methods("POST")
+	a.Router.HandleFunc("/files", a.getFiles).Methods("GET")
+	a.Router.HandleFunc("/files/find", a.findFiles).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.postTask).Methods("POST")
 	// Labels
