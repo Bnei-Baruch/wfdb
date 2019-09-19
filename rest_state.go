@@ -161,3 +161,17 @@ func (a *App) deleteState(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
+
+func (a *App) deleteStateJSON(w http.ResponseWriter, r *http.Request) {
+	var s state
+	vars := mux.Vars(r)
+	s.StateID = vars["id"]
+	value := vars["jsonb"]
+
+	if err := s.deleteStateJSON(a.DB, value); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}

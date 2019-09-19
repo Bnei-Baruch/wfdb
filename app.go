@@ -148,6 +148,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("PUT")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateValue).Methods("POST")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
+	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.deleteStateJSON).Methods("DELETE")
 	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getState).Methods("GET")
 	a.Router.HandleFunc("/state", a.getStates).Methods("GET")
 	// Files

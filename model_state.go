@@ -127,3 +127,10 @@ func (s *state) deleteState(db *sql.DB) error {
 
 	return err
 }
+
+func (s *state) deleteStateJSON(db *sql.DB, value string) error {
+	_, err := db.Exec("UPDATE state SET data = data - $2 WHERE state_id=$1",
+		s.StateID, value)
+
+	return err
+}
