@@ -77,6 +77,18 @@ func (s *state) getState(db *sql.DB) error {
 	return err
 }
 
+func (s *state) getStateJSON(db *sql.DB, key string) error {
+	var obj []byte
+	err := db.QueryRow("SELECT data->>$2 FROM state where state_id = $1",
+		s.StateID, key).Scan(&obj)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(obj, &s.Data)
+
+	return err
+}
+
 func (s *state) postState(db *sql.DB) error {
 	v, _ := json.Marshal(s.Data)
 

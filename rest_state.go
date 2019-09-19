@@ -63,6 +63,25 @@ func (a *App) getState(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, s.Data)
 }
 
+func (a *App) getStateJSON(w http.ResponseWriter, r *http.Request) {
+	var s state
+	vars := mux.Vars(r)
+	s.StateID = vars["id"]
+	key := vars["jsonb"]
+
+	if err := s.getStateJSON(a.DB, key); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Not Found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, s.Data)
+}
+
 func (a *App) postState(w http.ResponseWriter, r *http.Request) {
 	var s state
 	vars := mux.Vars(r)
