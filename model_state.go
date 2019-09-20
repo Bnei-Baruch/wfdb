@@ -65,6 +65,33 @@ func getStates(db *sql.DB, start, count int) ([]state, error) {
 	return states, nil
 }
 
+func getStateTree(db *sql.DB, start, count int) (map[string]interface{}, error) {
+	rows, err := db.Query(
+		"SELECT id, state_id, data FROM state ORDER BY state_id DESC LIMIT $1 OFFSET $2",
+		count, start)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	states := make(map[string]interface{})
+
+	for rows.Next() {
+		var s state
+		var o map[string]interface{}
+		var obj []byte
+		if err := rows.Scan(&s.ID, &s.StateID, &obj); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(obj, &o)
+		states[s.StateID] = o
+	}
+
+	return states, nil
+}
+
 func (s *state) getState(db *sql.DB) error {
 	var obj []byte
 	err := db.QueryRow("SELECT data FROM state WHERE state_id = $1",
