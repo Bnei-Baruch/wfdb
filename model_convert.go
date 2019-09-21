@@ -118,7 +118,7 @@ func (i *convert) postConvert(db *sql.DB) error {
 
 	err := db.QueryRow(
 		"INSERT INTO convert(convert_id, name, date, progress, state, timestamp, langcheck) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (convert_id) DO UPDATE SET (convert_id, name, date, progress, state, timestamp, langcheck) = ($1, $2, $3, $4, $5, $6, $7) WHERE convert.convert_id = $1 RETURNING id",
-		i.ID, i.ConvertID, i.Name, i.Date, i.Progress, i.State, i.Timestamp, langcheck).Scan(&i.ID)
+		i.ConvertID, i.Name, i.Date, i.Progress, i.State, i.Timestamp, langcheck).Scan(&i.ID)
 
 	if err != nil {
 		return err

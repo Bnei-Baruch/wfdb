@@ -74,7 +74,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/convert", a.getConvert).Methods("GET")
 	a.Router.HandleFunc("/convert/find", a.findConvert).Methods("GET")
 	a.Router.HandleFunc("/convert/langcheck", a.findConvertByJSON).Methods("GET")
-	a.Router.HandleFunc("/convert/{id:a|t|d[0-9]+}", a.getConvertByID).Methods("GET")
+	a.Router.HandleFunc("/convert/{id:[t|d|a][0-9]+}", a.getConvertByID).Methods("GET")
 	a.Router.HandleFunc("/convert/{id}", a.postConvert).Methods("PUT")
 	a.Router.HandleFunc("/convert/{id}", a.deleteConvert).Methods("DELETE")
 	// Carbon
