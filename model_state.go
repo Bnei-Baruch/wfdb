@@ -11,6 +11,7 @@ type state struct {
 	ID      int                    `json:"id"`
 	StateID string                 `json:"state_id"`
 	Data    map[string]interface{} `json:"data"`
+	Tag		string                 `json:"tag"`
 }
 
 func findStates(db *sql.DB, key string, value string) ([]state, error) {
@@ -39,10 +40,9 @@ func findStates(db *sql.DB, key string, value string) ([]state, error) {
 	return states, nil
 }
 
-func getStates(db *sql.DB, start, count int) ([]state, error) {
+func getStates(db *sql.DB) ([]state, error) {
 	rows, err := db.Query(
-		"SELECT id, state_id, data FROM state ORDER BY state_id DESC LIMIT $1 OFFSET $2",
-		count, start)
+		"SELECT id, state_id, data, tag FROM state ORDER BY state_id DESC")
 
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func getStates(db *sql.DB, start, count int) ([]state, error) {
 	for rows.Next() {
 		var s state
 		var obj []byte
-		if err := rows.Scan(&s.ID, &s.StateID, &obj); err != nil {
+		if err := rows.Scan(&s.ID, &s.StateID, &obj, &s.Tag); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(obj, &s.Data)
@@ -65,10 +65,10 @@ func getStates(db *sql.DB, start, count int) ([]state, error) {
 	return states, nil
 }
 
-func getStateTree(db *sql.DB, start, count int) (map[string]interface{}, error) {
+func getStateByTag(db *sql.DB, tag string) (map[string]interface{}, error) {
 	rows, err := db.Query(
-		"SELECT id, state_id, data FROM state ORDER BY state_id DESC LIMIT $1 OFFSET $2",
-		count, start)
+		"SELECT id, state_id, data FROM state WHERE tag = $1 ORDER BY state_id DESC",
+		tag)
 
 	if err != nil {
 		return nil, err
@@ -120,8 +120,8 @@ func (s *state) postState(db *sql.DB) error {
 	v, _ := json.Marshal(s.Data)
 
 	err := db.QueryRow(
-		"INSERT INTO state(state_id, data) VALUES($1, $2) ON CONFLICT (state_id) DO UPDATE SET data = $2 WHERE state.state_id = $1 RETURNING id",
-		s.StateID, v).Scan(&s.ID)
+		"INSERT INTO state(state_id, data, tag) VALUES($1, $2, $3) ON CONFLICT (state_id) DO UPDATE SET data = $2 WHERE state.state_id = $1 RETURNING id",
+		s.StateID, v, s.Tag).Scan(&s.ID)
 
 	if err != nil {
 		return err

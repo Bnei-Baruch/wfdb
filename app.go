@@ -142,22 +142,12 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/jobs", a.getActiveJobs).Methods("GET")
 	a.Router.HandleFunc("/jobs/find", a.findJob).Methods("GET")
 	a.Router.HandleFunc("/jobs/{jsonb}", a.findJobByJSON).Methods("GET")
-	// State
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.postState).Methods("PUT")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.updateState).Methods("POST")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateJSON).Methods("PUT")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.postStateValue).Methods("POST")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.deleteState).Methods("DELETE")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.deleteStateJSON).Methods("DELETE")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}", a.getState).Methods("GET")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+}/{jsonb}", a.getStateJSON).Methods("GET")
-	a.Router.HandleFunc("/state", a.getStates).Methods("GET")
 	// Files
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postFile).Methods("PUT")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.getFile).Methods("GET")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.deleteFile).Methods("DELETE")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.postFileJSON).Methods("PUT")
-	a.Router.HandleFunc("/state/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.postFileValue).Methods("POST")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.postFileValue).Methods("POST")
 	a.Router.HandleFunc("/files", a.getFiles).Methods("GET")
 	a.Router.HandleFunc("/files/find", a.findFiles).Methods("GET")
 	// Tasks
@@ -166,6 +156,17 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/labels", a.getLabels).Methods("GET")
 	a.Router.HandleFunc("/label/{id:[0-9]+}", a.getLabel).Methods("GET")
 	a.Router.HandleFunc("/labels/find", a.findLabels).Methods("GET")
+	// State
+	a.Router.HandleFunc("/states", a.getStates).Methods("GET")
+	a.Router.HandleFunc("/{tag}", a.getStateByTag).Methods("GET")
+	a.Router.HandleFunc("/{tag}/{id}", a.getState).Methods("GET")
+	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.getStateJSON).Methods("GET")
+	a.Router.HandleFunc("/{tag}/{id}", a.postState).Methods("PUT")
+	a.Router.HandleFunc("/{tag}/{id}", a.updateState).Methods("POST")
+	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.postStateJSON).Methods("PUT")
+	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.postStateValue).Methods("POST")
+	a.Router.HandleFunc("/{tag}/{id}", a.deleteState).Methods("DELETE")
+	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.deleteStateJSON).Methods("DELETE")
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

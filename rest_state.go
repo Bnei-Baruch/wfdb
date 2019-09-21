@@ -5,11 +5,9 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
-	"strconv"
-
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"net/http"
 )
 
 func (a *App) findState(w http.ResponseWriter, r *http.Request) {
@@ -25,18 +23,22 @@ func (a *App) findState(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, states)
 }
 
+func (a *App) getStateByTag(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	tag := vars["tag"]
+
+	states, err := getStateByTag(a.DB, tag)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, states)
+}
+
 func (a *App) getStates(w http.ResponseWriter, r *http.Request) {
-	count, _ := strconv.Atoi(r.FormValue("count"))
-	start, _ := strconv.Atoi(r.FormValue("start"))
 
-	if count < 1 {
-		count = 100
-	}
-	if start < 0 {
-		start = 0
-	}
-
-	states, err := getStates(a.DB, start, count)
+	states, err := getStates(a.DB)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -66,6 +68,7 @@ func (a *App) getState(w http.ResponseWriter, r *http.Request) {
 func (a *App) getStateJSON(w http.ResponseWriter, r *http.Request) {
 	var s state
 	vars := mux.Vars(r)
+	s.Tag = vars["tag"]
 	s.StateID = vars["id"]
 	key := vars["jsonb"]
 
@@ -85,6 +88,7 @@ func (a *App) getStateJSON(w http.ResponseWriter, r *http.Request) {
 func (a *App) postState(w http.ResponseWriter, r *http.Request) {
 	var s state
 	vars := mux.Vars(r)
+	s.Tag = vars["tag"]
 	s.StateID = vars["id"]
 
 	d := json.NewDecoder(r.Body)

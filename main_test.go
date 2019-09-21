@@ -239,6 +239,7 @@ const createUStateTable = `CREATE TABLE IF NOT EXISTS state
 (
 id BIGSERIAL,
 state_id TEXT NOT NULL,
+tag TEXT,
 data jsonb NOT NULL,
 CONSTRAINT state_pkey PRIMARY KEY (state_id)
 )`
