@@ -96,6 +96,44 @@ func (a *App) postConvert(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) postConvertValue(w http.ResponseWriter, r *http.Request) {
+	var i convert
+	vars := mux.Vars(r)
+	i.ConvertID = vars["id"]
+	key := vars["key"]
+	value := r.FormValue("value")
+
+	if err := i.postConvertValue(a.DB, key, value); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func (a *App) postConvertJSON(w http.ResponseWriter, r *http.Request) {
+	var i convert
+	vars := mux.Vars(r)
+	i.ConvertID = vars["id"]
+	key := vars["jsonb"]
+	var jsonb map[string]interface{}
+
+	d := json.NewDecoder(r.Body)
+	if err := d.Decode(&jsonb); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+
+	defer r.Body.Close()
+
+	if err := i.postConvertJSON(a.DB, jsonb, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func (a *App) deleteConvert(w http.ResponseWriter, r *http.Request) {
 	var i convert
 	vars := mux.Vars(r)

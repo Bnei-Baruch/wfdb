@@ -127,6 +127,23 @@ func (i *convert) postConvert(db *sql.DB) error {
 	return nil
 }
 
+func (i *convert) postConvertValue(db *sql.DB, key string, value string) error {
+
+	sqlStatement := fmt.Sprintf("UPDATE convert SET %s='%s' WHERE convert_id='%s';", key, value, i.ConvertID)
+	_, err := db.Query(sqlStatement)
+
+	return err
+}
+
+func (i *convert) postConvertJSON(db *sql.DB, jsonb interface{}, key string) error {
+	v, _ := json.Marshal(jsonb)
+
+	sqlStatement := `UPDATE convert SET `+key+` = $2 WHERE convert_id=$1;`
+	_, err := db.Exec(sqlStatement, i.ConvertID, v)
+
+	return err
+}
+
 func (i *convert) deleteConvert(db *sql.DB) error {
 	_, err := db.Exec("DELETE FROM convert WHERE convert_id=$1", i.ConvertID)
 

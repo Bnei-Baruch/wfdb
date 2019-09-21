@@ -76,6 +76,8 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/convert/langcheck", a.findConvertByJSON).Methods("GET")
 	a.Router.HandleFunc("/convert/{id:[t|d|a][0-9]+}", a.getConvertByID).Methods("GET")
 	a.Router.HandleFunc("/convert/{id}", a.postConvert).Methods("PUT")
+	a.Router.HandleFunc("/convert/{id}/{key}", a.postConvertValue).Methods("POST")
+	a.Router.HandleFunc("/convert/{id}/{jsonb}", a.postConvertJSON).Methods("PUT")
 	a.Router.HandleFunc("/convert/{id}", a.deleteConvert).Methods("DELETE")
 	// Carbon
 	a.Router.HandleFunc("/carbon/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postCarbonFile).Methods("PUT")
