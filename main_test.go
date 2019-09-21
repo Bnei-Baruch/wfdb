@@ -171,6 +171,19 @@ sha1 VARCHAR(40) NOT NULL,
 CONSTRAINT archive_pkey PRIMARY KEY (archive_id)
 )`
 
+const createUConvertTable = `CREATE TABLE IF NOT EXISTS convert
+(
+id BIGSERIAL,
+convert_id TEXT NOT NULL,
+name TEXT,
+date VARCHAR(10),
+progress TEXT,
+state TEXT,
+timestamp TEXT,
+langcheck jsonb,
+CONSTRAINT convert_pkey PRIMARY KEY (convert_id)
+)`
+
 const createCarbonTable = `CREATE TABLE IF NOT EXISTS carbon
 (
 id BIGSERIAL,

@@ -70,6 +70,13 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/archive/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.deleteArFile).Methods("DELETE")
 	a.Router.HandleFunc("/archive", a.getArFiles).Methods("GET")
 	a.Router.HandleFunc("/archive/find", a.findArFiles).Methods("GET")
+	// Convert
+	a.Router.HandleFunc("/convert", a.getConvert).Methods("GET")
+	a.Router.HandleFunc("/convert/find", a.findConvert).Methods("GET")
+	a.Router.HandleFunc("/convert/langcheck", a.findConvertByJSON).Methods("GET")
+	a.Router.HandleFunc("/convert/{id:a|t|d[0-9]+}", a.getConvertByID).Methods("GET")
+	a.Router.HandleFunc("/convert/{id}", a.postConvert).Methods("PUT")
+	a.Router.HandleFunc("/convert/{id}", a.deleteConvert).Methods("DELETE")
 	// Carbon
 	a.Router.HandleFunc("/carbon/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.postCarbonFile).Methods("PUT")
 	a.Router.HandleFunc("/carbon/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.getCarbonFile).Methods("GET")
