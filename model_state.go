@@ -42,7 +42,7 @@ func findStates(db *sql.DB, key string, value string) ([]state, error) {
 
 func getStates(db *sql.DB) ([]state, error) {
 	rows, err := db.Query(
-		"SELECT id, state_id, data, tag FROM state ORDER BY state_id DESC")
+		"SELECT id, state_id, data, tag FROM state ORDER BY tag")
 
 	if err != nil {
 		return nil, err
