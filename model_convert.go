@@ -9,18 +9,18 @@ import (
 )
 
 type convert struct {
-	ID    int							`json:"id"`
-	ConvertID  string 				 	`json:"convert_id"`
-	Name string							`json:"name"`
-	Date string							`json:"date"`
-	Progress string						`json:"progress"`
-	State string						`json:"state"`
-	Timestamp string					`json:"timestamp"`
-	Langcheck map[string]interface{}	`json:"langcheck"`
+	ID        int                    `json:"id"`
+	ConvertID string                 `json:"convert_id"`
+	Name      string                 `json:"name"`
+	Date      string                 `json:"date"`
+	Progress  string                 `json:"progress"`
+	State     string                 `json:"state"`
+	Timestamp string                 `json:"timestamp"`
+	Langcheck map[string]interface{} `json:"langcheck"`
 }
 
 func findConvert(db *sql.DB, key string, value string) ([]convert, error) {
-	sqlStatement := `SELECT * FROM convert WHERE `+key+` LIKE '%`+value+`%' ORDER BY convert_id`
+	sqlStatement := `SELECT * FROM convert WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY convert_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -130,7 +130,7 @@ func (i *convert) postConvert(db *sql.DB) error {
 func (i *convert) postConvertValue(db *sql.DB, key string, value string) error {
 
 	sqlStatement := fmt.Sprintf("UPDATE convert SET %s='%s' WHERE convert_id='%s';", key, value, i.ConvertID)
-	_, err := db.Query(sqlStatement)
+	_, err := db.Exec(sqlStatement)
 
 	return err
 }
@@ -138,7 +138,7 @@ func (i *convert) postConvertValue(db *sql.DB, key string, value string) error {
 func (i *convert) postConvertJSON(db *sql.DB, jsonb interface{}, key string) error {
 	v, _ := json.Marshal(jsonb)
 
-	sqlStatement := `UPDATE convert SET `+key+` = $2 WHERE convert_id=$1;`
+	sqlStatement := `UPDATE convert SET ` + key + ` = $2 WHERE convert_id=$1;`
 	_, err := db.Exec(sqlStatement, i.ConvertID, v)
 
 	return err
