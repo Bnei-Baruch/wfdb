@@ -6,6 +6,7 @@ import "os"
 
 func main() {
 	a := App{}
+	a.initOidc(os.Getenv("ACC_URL"))
 	a.Initialize(
 		os.Getenv("APP_DB_USERNAME"),
 		os.Getenv("APP_DB_PASSWORD"),

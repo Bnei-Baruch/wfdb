@@ -3,9 +3,11 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/coreos/go-oidc"
 	"log"
 	"net/http"
 
@@ -16,9 +18,22 @@ import (
 )
 
 type App struct {
-	Router *mux.Router
-	DB     *sql.DB
-	MSDB   *sql.DB
+	tokenVerifier *oidc.IDTokenVerifier
+	Router        *mux.Router
+	DB            *sql.DB
+	MSDB          *sql.DB
+}
+
+func (a *App) initOidc(acc string) {
+	var oidcIDTokenVerifier *oidc.IDTokenVerifier
+	oidcProvider, err := oidc.NewProvider(context.TODO(), acc)
+	if err != nil {
+		panic("Login failed:" + err.Error())
+	}
+	oidcIDTokenVerifier = oidcProvider.Verifier(&oidc.Config{
+		SkipClientIDCheck: true,
+	})
+	a.tokenVerifier = oidcIDTokenVerifier
 }
 
 func (a *App) Initialize(user string, password string, dbname string, host string, user_id string, pass string, name string) {
@@ -52,6 +67,7 @@ func (a *App) Run(addr string) {
 }
 
 func (a *App) initializeRoutes() {
+	a.Router.Use(a.loggingMiddleware)
 	a.Router.HandleFunc("/metus/find", a.findMetus).Methods("GET")
 	a.Router.HandleFunc("/metus/{id:[0-9]+}", a.getMetusByID).Methods("GET")
 	// Capture
