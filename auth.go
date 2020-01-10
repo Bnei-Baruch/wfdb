@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"net"
@@ -36,6 +37,45 @@ type IDTokenClaims struct {
 	Typ               string           `json:"typ"`
 }
 
+type ipRange struct {
+	start net.IP
+	end   net.IP
+}
+
+var allowedRanges = []ipRange{
+	ipRange{
+		start: net.ParseIP("xx.xx.xx.xx"),
+		end:   net.ParseIP("xx.xx.xx.xx"),
+	},
+	ipRange{
+		start: net.ParseIP("xx.xx.xx.xx"),
+		end:   net.ParseIP("xx.xx.xx.xx"),
+	},
+	ipRange{
+		start: net.ParseIP("xx.xx.xx.xx"),
+		end:   net.ParseIP("xx.xx.xx.xx"),
+	},
+}
+
+func inRange(r ipRange, ipAddress net.IP) bool {
+	// strcmp type byte comparison
+	if bytes.Compare(ipAddress, r.start) >= 0 && bytes.Compare(ipAddress, r.end) < 0 {
+		return true
+	}
+	return false
+}
+
+func isAllowedRange(ipAddress net.IP) bool {
+	if ipCheck := ipAddress.To4(); ipCheck != nil {
+		for _, r := range allowedRanges {
+			if inRange(r, ipAddress) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (a *App) loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -43,17 +83,20 @@ func (a *App) loggingMiddleware(next http.Handler) http.Handler {
 		ip := getRealIP(r)
 
 		// Check if IP is private
-		private, err := isPrivateIP(ip)
-		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
-			return
-		}
+		//private, err := isPrivateIP(ip)
+		//if err != nil {
+		//	respondWithError(w, http.StatusBadRequest, err.Error())
+		//	return
+		//}
 
-		if private == true {
+		ip = strings.TrimSpace(ip)
+		chip := net.ParseIP(ip)
+
+		if isAllowedRange(chip) {
 			next.ServeHTTP(w, r)
 		} else {
 			authHeader := strings.Split(strings.TrimSpace(r.Header.Get("Authorization")), " ")
-			if len(authHeader) == 2 || strings.ToLower(authHeader[0]) == "bearer" {
+			if len(authHeader) == 2 && strings.ToLower(authHeader[0]) == "bearer" && len(authHeader[1]) > 0 {
 
 				token, err := a.tokenVerifier.Verify(context.TODO(), authHeader[1])
 				if err != nil {
@@ -67,6 +110,13 @@ func (a *App) loggingMiddleware(next http.Handler) http.Handler {
 					respondWithError(w, http.StatusBadRequest, err.Error())
 					return
 				}
+
+				// Check permission
+				if !checkPermission(claims.RealmAccess.Roles) {
+					respondWithError(w, http.StatusForbidden, "Access denied")
+					return
+				}
+
 				next.ServeHTTP(w, r)
 			} else {
 				respondWithError(w, http.StatusBadRequest, "Token not found")
@@ -75,6 +125,17 @@ func (a *App) loggingMiddleware(next http.Handler) http.Handler {
 		}
 
 	})
+}
+
+func checkPermission(roles []string) bool {
+	if roles != nil {
+		for _, r := range roles {
+			if r == "bb_user" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func getRealIP(r *http.Request) string {
