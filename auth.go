@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"net"
@@ -37,62 +36,21 @@ type IDTokenClaims struct {
 	Typ               string           `json:"typ"`
 }
 
-type ipRange struct {
-	start net.IP
-	end   net.IP
-}
-
-var allowedRanges = []ipRange{
-	ipRange{
-		start: net.ParseIP("xx.xx.xx.xx"),
-		end:   net.ParseIP("xx.xx.xx.xx"),
-	},
-	ipRange{
-		start: net.ParseIP("xx.xx.xx.xx"),
-		end:   net.ParseIP("xx.xx.xx.xx"),
-	},
-	ipRange{
-		start: net.ParseIP("xx.xx.xx.xx"),
-		end:   net.ParseIP("xx.xx.xx.xx"),
-	},
-}
-
-func inRange(r ipRange, ipAddress net.IP) bool {
-	// strcmp type byte comparison
-	if bytes.Compare(ipAddress, r.start) >= 0 && bytes.Compare(ipAddress, r.end) < 0 {
-		return true
-	}
-	return false
-}
-
-func isAllowedRange(ipAddress net.IP) bool {
-	if ipCheck := ipAddress.To4(); ipCheck != nil {
-		for _, r := range allowedRanges {
-			if inRange(r, ipAddress) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (a *App) loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		// Detect client IP
 		ip := getRealIP(r)
 
-		// Check if IP is private
-		//private, err := isPrivateIP(ip)
-		//if err != nil {
-		//	respondWithError(w, http.StatusBadRequest, err.Error())
-		//	return
-		//}
+		// Check if IP is allowed
+		allow, err := isAllowedIP(ip)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, "Invalid IP")
+			return
+		}
 
-		ip = strings.TrimSpace(ip)
-		chip := net.ParseIP(ip)
-
-		if isAllowedRange(chip) {
+		// Allowed IP - skip auth
+		if allow {
 			next.ServeHTTP(w, r)
 		} else {
 			authHeader := strings.Split(strings.TrimSpace(r.Header.Get("Authorization")), " ")
@@ -161,6 +119,21 @@ func getRealIP(r *http.Request) string {
 	}
 
 	return remoteIP
+}
+
+func isAllowedIP(ip string) (bool, error) {
+	var err error
+	allow := false
+	ip = strings.TrimSpace(ip)
+	IP := net.ParseIP(ip)
+	if IP == nil {
+		err = errors.New("Invalid IP")
+	} else {
+		_, lcl, _ := net.ParseCIDR("xx.xx.xx.xx/xx")
+		_, vpn, _ := net.ParseCIDR("xx.xx.xx.xx/xx")
+		allow = lcl.Contains(IP) || vpn.Contains(IP)
+	}
+	return allow, err
 }
 
 func isPrivateIP(ip string) (bool, error) {
