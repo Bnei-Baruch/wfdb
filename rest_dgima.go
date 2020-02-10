@@ -31,7 +31,7 @@ func (a *App) findDgimaByJSON(w http.ResponseWriter, r *http.Request) {
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	if(ep == "sha1") {
+	if ep == "sha1" {
 
 		files, err := findDgimaBySHA1(a.DB, value)
 		if err != nil {
@@ -75,6 +75,17 @@ func (a *App) getDgima(w http.ResponseWriter, r *http.Request) {
 func (a *App) getFilesToDgima(w http.ResponseWriter, r *http.Request) {
 
 	files, err := getFilesToDgima(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, files)
+}
+
+func (a *App) getCassetteFiles(w http.ResponseWriter, r *http.Request) {
+
+	files, err := getCassetteFiles(a.DB)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -191,7 +202,6 @@ func (a *App) postDgimaValue(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
 
 func (a *App) deleteDgimaID(w http.ResponseWriter, r *http.Request) {
 	var d dgima
