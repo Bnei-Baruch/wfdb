@@ -8,10 +8,10 @@ import (
 )
 
 type state struct {
-	ID      int                    `json:"id"`
-	StateID string                 `json:"state_id"`
-	Data    map[string]interface{} `json:"data"`
-	Tag		string                 `json:"tag"`
+	ID      int         `json:"id"`
+	StateID string      `json:"state_id"`
+	Data    interface{} `json:"data"`
+	Tag     string      `json:"tag"`
 }
 
 func findStates(db *sql.DB, key string, value string) ([]state, error) {
