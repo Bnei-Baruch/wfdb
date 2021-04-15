@@ -128,7 +128,8 @@ func isAllowedIP(ipAddr string) bool {
 		return false
 	}
 
+	_, lbk, _ := net.ParseCIDR("127.0.0.0/8")
 	_, lcl, _ := net.ParseCIDR("10.66.0.0/16")
 	_, vpn, _ := net.ParseCIDR("172.16.102.0/24")
-	return lcl.Contains(ip) || vpn.Contains(ip)
+	return lbk.Contains(ip) || lcl.Contains(ip) || vpn.Contains(ip)
 }

@@ -38,21 +38,19 @@ func (a *App) InitDB() {
 	name := common.METUS_DB_NAME
 
 	connectionString :=
-		fmt.Sprintf("Postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
+		fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
 
 	var err error
-	a.DB, err = sql.Open("Postgres", connectionString)
+	a.DB, err = sql.Open("postgres", connectionString)
 	if err != nil {
-		log.Fatal().Str("source", "APP").Err(err).Msg("Error open db")
+		log.Fatal().Str("source", "APP").Err(err).Msg("Error open wfdb")
 	}
 
 	conString := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s;encrypt=disable;", host, user_id, pass, name)
 	a.MSDB, err = sql.Open("mssql", conString)
 	if err != nil {
-		log.Fatal().Str("source", "APP").Err(err).Msg("Error open db")
+		log.Fatal().Str("source", "APP").Err(err).Msg("Error open metus db")
 	}
-
-	//defer a.MSDB.Close()
 }
 
 func (a *App) Initialize(accountsUrl string, skipAuth bool) {

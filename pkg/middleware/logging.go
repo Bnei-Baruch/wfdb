@@ -38,7 +38,7 @@ func init() {
 
 	zerolog.CallerFieldName = "line"
 	zerolog.CallerMarshalFunc = func(file string, line int) string {
-		rel := strings.Split(file, "exec-api/")
+		rel := strings.Split(file, "wfdb/")
 		return fmt.Sprintf("%s:%d", rel[1], line)
 	}
 
@@ -96,7 +96,7 @@ func InitLog() {
 	}
 
 	if err := os.MkdirAll(c.Directory, 0744); err != nil {
-		log.Error().Err(err).Str("path", c.Directory).Msg("can't create log directory")
+		log.Error().Err(err).Str("path", c.Directory).Msg("can't create log directory" + c.Directory)
 	}
 
 	if c.ConsoleLoggingEnabled {

@@ -19,11 +19,6 @@ var a api.App
 
 func TestMain(m *testing.M) {
 	a = api.App{}
-	a.Initialize(
-		os.Getenv("TEST_DB_USERNAME"),
-		os.Getenv("TEST_DB_PASSWORD"),
-		os.Getenv("TEST_DB_NAME"))
-
 	ensureTableExists()
 
 	code := m.Run()
