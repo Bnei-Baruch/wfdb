@@ -1,5 +1,3 @@
-// rest_carbon.go
-
 package api
 
 import (

@@ -1,5 +1,3 @@
-// rest_ingest.go
-
 package api
 
 import (

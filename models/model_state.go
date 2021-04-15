@@ -1,5 +1,3 @@
-// model_state.go
-
 package models
 
 import (

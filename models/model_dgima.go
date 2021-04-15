@@ -1,5 +1,3 @@
-// model_dgima.go
-
 package models
 
 import (

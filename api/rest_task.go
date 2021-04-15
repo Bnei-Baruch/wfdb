@@ -1,5 +1,3 @@
-// rest_task.go
-
 package api
 
 import (

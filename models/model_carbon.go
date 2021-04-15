@@ -1,5 +1,3 @@
-// model_carbon.go
-
 package models
 
 import (

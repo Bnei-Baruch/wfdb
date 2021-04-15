@@ -1,5 +1,3 @@
-// rest_metus.go
-
 package api
 
 import (

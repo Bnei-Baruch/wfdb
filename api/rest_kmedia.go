@@ -1,5 +1,3 @@
-// rest_kmedia.go
-
 package api
 
 import (

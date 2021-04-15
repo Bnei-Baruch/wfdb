@@ -1,5 +1,3 @@
-// model_jobs.go
-
 package models
 
 import (

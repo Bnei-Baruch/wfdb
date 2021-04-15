@@ -1,5 +1,3 @@
-// rest_dgima.go
-
 package api
 
 import (

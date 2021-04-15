@@ -1,5 +1,3 @@
-// rest_jobs.go
-
 package api
 
 import (

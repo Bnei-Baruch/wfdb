@@ -1,5 +1,3 @@
-// model_kmedia.go
-
 package models
 
 import (

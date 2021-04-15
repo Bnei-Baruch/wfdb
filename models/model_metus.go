@@ -1,5 +1,3 @@
-// model_metus.go
-
 package models
 
 import (

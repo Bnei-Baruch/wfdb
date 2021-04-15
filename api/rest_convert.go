@@ -1,5 +1,3 @@
-// rest_convert.go
-
 package api
 
 import (

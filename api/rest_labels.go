@@ -1,5 +1,3 @@
-// rest_labels.go
-
 package api
 
 import (

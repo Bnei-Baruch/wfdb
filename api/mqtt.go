@@ -87,9 +87,9 @@ func (a *App) SendRespond(id string, m *MqttPayload) {
 	var topic string
 
 	if id == "false" {
-		topic = common.ServiceDataTopic + common.EP
+		topic = common.ServiceDataTopic
 	} else {
-		topic = common.ServiceDataTopic + common.EP + "/" + id
+		topic = common.ServiceDataTopic + "/" + id
 	}
 	message, err := json.Marshal(m)
 	if err != nil {

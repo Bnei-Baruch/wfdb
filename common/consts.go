@@ -3,34 +3,28 @@ package common
 import "os"
 
 var (
-	MltMain   = os.Getenv("MLT_MAIN")
-	MltBackup = os.Getenv("MLT_BACKUP")
-	MainCap   = os.Getenv("MAIN_CAP")
-	BackupCap = os.Getenv("BACKUP_CAP")
-	ArchCap   = os.Getenv("ARCH_CAP")
+	LISTEN_ADDRESS = os.Getenv("LISTEN_ADDRESS")
+	ACC_URL        = os.Getenv("ACC_URL")
+	SKIP_AUTH      = os.Getenv("SKIP_AUTH") == "true"
 
-	SdbUrl   = os.Getenv("SDB_URL")
-	WfApiUrl = os.Getenv("WFAPI_URL")
-	MdbUrl   = os.Getenv("MDB_URL")
-	WfdbUrl  = os.Getenv("WFDB_URL")
+	APP_DB_USERNAME   = os.Getenv("APP_DB_USERNAME")
+	APP_DB_PASSWORD   = os.Getenv("APP_DB_PASSWORD")
+	APP_DB_NAME       = os.Getenv("APP_DB_NAME")
+	METUS_DB_HOST     = os.Getenv("METUS_DB_HOST")
+	METUS_DB_USERNAME = os.Getenv("METUS_DB_USERNAME")
+	METUS_DB_PASSWORD = os.Getenv("METUS_DB_PASSWORD")
+	METUS_DB_NAME     = os.Getenv("METUS_DB_NAME")
 
-	EP       = os.Getenv("MQTT_EP")
 	SERVER   = os.Getenv("MQTT_URL")
 	USERNAME = os.Getenv("MQTT_USER")
 	PASSWORD = os.Getenv("MQTT_PASS")
 
-	CapPath = os.Getenv("CAP_PATH")
 	LogPath = os.Getenv("LOG_PATH")
 
-	WFCAP = os.Getenv("WF_CAP")
-
-	ServiceTopic  = "exec/service/" + EP + "/#"
-	WorkflowTopic = "workflow/service/capture/" + EP
-	StateTopic    = "workflow/state/capture/" + WFCAP
+	ServiceTopic = "wfdb/service/#"
 )
 
 const (
-	ExtPrefix         = "kli/"
-	ServiceDataTopic  = "exec/service/data/"
-	WorkflowDataTopic = "workflow/service/data/"
+	ExtPrefix        = "kli/"
+	ServiceDataTopic = "wfdb/service/data/"
 )

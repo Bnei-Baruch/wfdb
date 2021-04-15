@@ -1,5 +1,3 @@
-// model_ingest.go
-
 package models
 
 import (

@@ -28,7 +28,15 @@ type App struct {
 	Msg           mqtt.Client
 }
 
-func (a *App) InitDB(user string, password string, dbname string, host string, user_id string, pass string, name string) {
+func (a *App) InitDB() {
+	user := common.APP_DB_USERNAME
+	password := common.APP_DB_PASSWORD
+	dbname := common.APP_DB_NAME
+	host := common.METUS_DB_HOST
+	user_id := common.METUS_DB_USERNAME
+	pass := common.METUS_DB_PASSWORD
+	name := common.METUS_DB_NAME
+
 	connectionString :=
 		fmt.Sprintf("Postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
 
@@ -243,7 +251,7 @@ func (a *App) initMQTT() {
 		//a.InitLogMQTT()
 		opts := mqtt.NewClientOptions()
 		opts.AddBroker(fmt.Sprintf("ssl://%s", common.SERVER))
-		opts.SetClientID(common.EP + "-exec_mqtt_client")
+		opts.SetClientID("wfdb_mqtt_client")
 		opts.SetUsername(common.USERNAME)
 		opts.SetPassword(common.PASSWORD)
 		opts.SetAutoReconnect(true)

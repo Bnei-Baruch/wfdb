@@ -1,5 +1,3 @@
-// model_convert.go
-
 package models
 
 import (

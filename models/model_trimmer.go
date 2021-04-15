@@ -1,5 +1,3 @@
-// model_trimmer.go
-
 package models
 
 import (

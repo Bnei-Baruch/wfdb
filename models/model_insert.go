@@ -1,5 +1,3 @@
-// model_insert.go
-
 package models
 
 import (

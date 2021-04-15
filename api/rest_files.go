@@ -1,5 +1,3 @@
-// rest_files.go
-
 package api
 
 import (

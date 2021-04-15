@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -61,8 +60,14 @@ func AuthenticationMiddleware(tokenVerifier *oidc.IDTokenVerifier, disabled bool
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			key := r.FormValue("key")
+			rCtx, ok := ContextFromRequest(r)
 
 			if disabled || key == os.Getenv("AUTH_KEY") {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			if ok && isAllowedIP(rCtx.IP) {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -85,7 +90,6 @@ func AuthenticationMiddleware(tokenVerifier *oidc.IDTokenVerifier, disabled bool
 				return
 			}
 
-			rCtx, ok := ContextFromRequest(r)
 			if ok {
 				rCtx.IDClaims = &claims
 			}
@@ -118,13 +122,13 @@ func CheckRole(role string, r *http.Request) bool {
 	return false
 }
 
-func isAllowedIP(ipAddr string) (bool, error) {
+func isAllowedIP(ipAddr string) bool {
 	ip := net.ParseIP(strings.TrimSpace(ipAddr))
 	if ip == nil {
-		return false, fmt.Errorf("invalid IP address %s", ipAddr)
+		return false
 	}
 
 	_, lcl, _ := net.ParseCIDR("10.66.0.0/16")
 	_, vpn, _ := net.ParseCIDR("172.16.102.0/24")
-	return lcl.Contains(ip) || vpn.Contains(ip), nil
+	return lcl.Contains(ip) || vpn.Contains(ip)
 }

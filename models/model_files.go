@@ -1,5 +1,3 @@
-// model_files.go
-
 package models
 
 import (

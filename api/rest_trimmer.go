@@ -1,5 +1,3 @@
-// rest_trimmer.go
-
 package api
 
 import (

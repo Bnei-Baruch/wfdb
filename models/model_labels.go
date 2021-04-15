@@ -1,5 +1,3 @@
-// model_labels.go
-
 package models
 
 import (

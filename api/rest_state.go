@@ -1,5 +1,3 @@
-// rest_state.go
-
 package api
 
 import (

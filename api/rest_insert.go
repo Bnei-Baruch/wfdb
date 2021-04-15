@@ -1,5 +1,3 @@
-// rest_insert.go
-
 package api
 
 import (
