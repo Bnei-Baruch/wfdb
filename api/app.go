@@ -171,6 +171,14 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.DeleteIngestID).Methods("DELETE")
 	a.Router.HandleFunc("/ingest", a.GetIngest).Methods("GET")
 	a.Router.HandleFunc("/ingest/find", a.FindIngest).Methods("GET")
+	// Source
+	a.Router.HandleFunc("/source/{id:c[0-9]+}", a.PostSourceID).Methods("PUT")
+	a.Router.HandleFunc("/source/{id:c[0-9]+}/wfstatus/{jsonb}", a.PostSourceValue).Methods("POST")
+	a.Router.HandleFunc("/source/{id:c[0-9]+}/{jsonb}", a.PostSourceJSON).Methods("POST")
+	a.Router.HandleFunc("/source/{id:c[0-9]+}", a.GetSourceID).Methods("GET")
+	a.Router.HandleFunc("/source/{id:c[0-9]+}", a.DeleteSourceID).Methods("DELETE")
+	a.Router.HandleFunc("/source", a.GetSource).Methods("GET")
+	a.Router.HandleFunc("/source/find", a.FindSource).Methods("GET")
 	// Dgima
 	a.Router.HandleFunc("/drim", a.GetFilesToDgima).Methods("GET")
 	a.Router.HandleFunc("/cassette", a.GetCassetteFiles).Methods("GET")

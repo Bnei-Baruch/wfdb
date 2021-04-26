@@ -63,6 +63,20 @@ wfstatus jsonb,
 CONSTRAINT capture_pkey PRIMARY KEY (capture_id)
 )`
 
+const createSourceTable = `CREATE TABLE IF NOT EXISTS source
+(
+id BIGSERIAL,
+source_id TEXT NOT NULL,
+date VARCHAR(10),
+file_name TEXT,
+sha1 VARCHAR(40),
+line jsonb,
+parent jsonb,
+source jsonb,
+wfstatus jsonb,
+CONSTRAINT source_pkey PRIMARY KEY (source_id)
+)`
+
 const createIngestTable = `CREATE TABLE IF NOT EXISTS ingest
 (
 id BIGSERIAL,
