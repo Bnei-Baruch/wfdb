@@ -164,11 +164,11 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/insert/find", a.FindInsertFiles).Methods("GET")
 	a.Router.HandleFunc("/insert/line", a.FindInsertByJSON).Methods("GET")
 	// Ingest
-	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.PostIngestID).Methods("PUT")
-	a.Router.HandleFunc("/ingest/{id:c[0-9]+}/wfstatus/{jsonb}", a.PostIngestValue).Methods("POST")
-	a.Router.HandleFunc("/ingest/{id:c[0-9]+}/{jsonb}", a.PostIngestJSON).Methods("POST")
-	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.GetIngestID).Methods("GET")
-	a.Router.HandleFunc("/ingest/{id:c[0-9]+}", a.DeleteIngestID).Methods("DELETE")
+	a.Router.HandleFunc("/ingest/{id:s[0-9]+}", a.PostIngestID).Methods("PUT")
+	a.Router.HandleFunc("/ingest/{id:s[0-9]+}/wfstatus/{jsonb}", a.PostIngestValue).Methods("POST")
+	a.Router.HandleFunc("/ingest/{id:s[0-9]+}/{jsonb}", a.PostIngestJSON).Methods("POST")
+	a.Router.HandleFunc("/ingest/{id:s[0-9]+}", a.GetIngestID).Methods("GET")
+	a.Router.HandleFunc("/ingest/{id:s[0-9]+}", a.DeleteIngestID).Methods("DELETE")
 	a.Router.HandleFunc("/ingest", a.GetIngest).Methods("GET")
 	a.Router.HandleFunc("/ingest/find", a.FindIngest).Methods("GET")
 	// Source
