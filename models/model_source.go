@@ -96,7 +96,7 @@ func (i *Source) PostSourceID(db *sql.DB) error {
 	wfstatus, _ := json.Marshal(i.Wfstatus)
 
 	err := db.QueryRow(
-		"INSERT INTO source(source_id, date, file_name, sha1, line, source, wfstatus) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (source_id) DO UPDATE SET (source_id, date, file_name, sha1, line, source, wfstatus) = ($1, $2, $3, $4, $5, $6, $7, $8) WHERE source.source_id = $1 RETURNING id",
+		"INSERT INTO source(source_id, date, file_name, sha1, line, source, wfstatus) VALUES($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (source_id) DO UPDATE SET (source_id, date, file_name, sha1, line, source, wfstatus) = ($1, $2, $3, $4, $5, $6, $7) WHERE source.source_id = $1 RETURNING id",
 		i.SourceID, i.Date, i.FileName, i.Sha1, line, source, wfstatus).Scan(&i.ID)
 
 	if err != nil {
