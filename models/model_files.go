@@ -6,20 +6,23 @@ import (
 )
 
 type Files struct {
-	ID        int                    `json:"id"`
-	FileID    string                 `json:"file_id"`
-	Date      string                 `json:"date"`
-	FileName  string                 `json:"file_name"`
-	Extension string                 `json:"extension"`
-	Size      int64                  `json:"size"`
-	Sha1      string                 `json:"sha1"`
-	FileType  string                 `json:"file_type"`
-	SendID    string                 `json:"send_id"`
-	Line      map[string]interface{} `json:"line"`
+	ID        int         `json:"id"`
+	FileID    string      `json:"file_id"`
+	Date      string      `json:"date"`
+	Language  string      `json:"language"`
+	FileName  string      `json:"file_name"`
+	Extension string      `json:"extension"`
+	Size      int64       `json:"size"`
+	Sha1      string      `json:"sha1"`
+	FileType  string      `json:"file_type"`
+	MimeType  string      `json:"mime_type"`
+	UID       string      `json:"uid"`
+	WID       string      `json:"wid"`
+	Props     interface{} `json:"properties"`
 }
 
 func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
-	sqlStatement := `SELECT id, file_id, date, file_name, extension, size, sha1, file_type, send_id, line FROM files WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY id`
+	sqlStatement := `SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties FROM files WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -32,11 +35,11 @@ func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
 
 	for rows.Next() {
 		var a Files
-		var line []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.SendID, &line); err != nil {
+		var properties []byte
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties); err != nil {
 			return nil, err
 		}
-		json.Unmarshal(line, &a.Line)
+		json.Unmarshal(properties, &a.Props)
 		o = append(o, a)
 	}
 
@@ -45,7 +48,7 @@ func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
 
 func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 	rows, err := db.Query(
-		"SELECT id, file_id, date, file_name, extension, size, sha1, file_type, send_id, line FROM files ORDER BY id DESC LIMIT $1 OFFSET $2",
+		"SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties FROM files ORDER BY id DESC LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -58,11 +61,11 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 
 	for rows.Next() {
 		var a Files
-		var line []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.SendID, &line); err != nil {
+		var properties []byte
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties); err != nil {
 			return nil, err
 		}
-		json.Unmarshal(line, &a.Line)
+		json.Unmarshal(properties, &a.Props)
 		o = append(o, a)
 	}
 
@@ -70,11 +73,11 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 }
 
 func (a *Files) GetFile(db *sql.DB) error {
-	var line []byte
+	var properties []byte
 
-	err := db.QueryRow("SELECT id, file_id, date, file_name, extension, size, sha1, file_type, send_id, line FROM files WHERE file_id = $1",
-		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.SendID, &line)
-	json.Unmarshal(line, &a.Line)
+	err := db.QueryRow("SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, proertires FROM files WHERE file_id = $1",
+		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties)
+	json.Unmarshal(properties, &a.Props)
 
 	if err != nil {
 		return err
@@ -84,10 +87,10 @@ func (a *Files) GetFile(db *sql.DB) error {
 }
 
 func (a *Files) PostFile(db *sql.DB) error {
-	line, _ := json.Marshal(a.Line)
+	properties, _ := json.Marshal(a.Props)
 	err := db.QueryRow(
-		"INSERT INTO files(file_id, date, file_name, extension, size, sha1, file_type, send_id, line) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, file_name, extension, size, sha1, file_type, send_id, line) = ($1, $2, $3, $4, $5, $6, $7, $8, $9) WHERE files.sha1 = $6 RETURNING id",
-		a.FileID, a.Date, a.FileName, a.Extension, a.Size, a.Sha1, a.FileType, a.SendID, line).Scan(&a.ID)
+		"INSERT INTO files(file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE files.sha1 = $7 RETURNING id",
+		&a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties).Scan(&a.ID)
 
 	if err != nil {
 		return err
@@ -97,14 +100,14 @@ func (a *Files) PostFile(db *sql.DB) error {
 }
 
 func (a *Files) PostFileStatus(db *sql.DB, value, key string) error {
-	_, err := db.Exec("UPDATE files SET line = line || json_build_object($3::text, $2::bool)::jsonb WHERE file_id=$1",
+	_, err := db.Exec("UPDATE files SET properties = properties || json_build_object($3::text, $2::bool)::jsonb WHERE file_id=$1",
 		a.FileID, value, key)
 
 	return err
 }
 
 func (a *Files) PostFileValue(db *sql.DB, value string, key string) error {
-	_, err := db.Exec("UPDATE files SET line = line || json_build_object($3::text, $2::text)::jsonb WHERE file_id=$1",
+	_, err := db.Exec("UPDATE files SET properties = properties || json_build_object($3::text, $2::text)::jsonb WHERE file_id=$1",
 		a.FileID, value, key)
 
 	return err
@@ -112,7 +115,7 @@ func (a *Files) PostFileValue(db *sql.DB, value string, key string) error {
 
 func (a *Files) PostFileJSON(db *sql.DB, value interface{}, key string) error {
 	v, _ := json.Marshal(value)
-	_, err := db.Exec("UPDATE files SET line = line || json_build_object($3::text, $2::jsonb)::jsonb WHERE file_id=$1",
+	_, err := db.Exec("UPDATE files SET properties = properties || json_build_object($3::text, $2::jsonb)::jsonb WHERE file_id=$1",
 		a.FileID, v, key)
 
 	return err

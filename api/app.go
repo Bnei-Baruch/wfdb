@@ -229,8 +229,8 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.PostFile).Methods("PUT")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.GetFile).Methods("GET")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.DeleteFile).Methods("DELETE")
-	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.PostFileJSON).Methods("PUT")
-	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/line/{jsonb}", a.PostFileValue).Methods("POST")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/properties/{jsonb}", a.PostFileJSON).Methods("PUT")
+	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}/properties/{jsonb}", a.PostFileValue).Methods("POST")
 	a.Router.HandleFunc("/files", a.GetFiles).Methods("GET")
 	a.Router.HandleFunc("/files/find", a.FindFiles).Methods("GET")
 	// Tasks
