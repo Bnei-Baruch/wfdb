@@ -50,7 +50,7 @@ func FindProduct(db *sql.DB, key string, value string) ([]Products, error) {
 
 func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Products, error) {
 
-	sqlStatement := fmt.Sprintf("SELECT id, product_id, date, language, origin_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE %s ->> '%s' = '%s' ORDER BY product_id;", ep, key, value)
+	sqlStatement := fmt.Sprintf("SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE %s ->> '%s' = '%s' ORDER BY product_id;", ep, key, value)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -82,7 +82,7 @@ func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Produ
 
 func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT id, product_id, date, language, origin_language, pattern, product_name, product_type, parent, line, wfstatus FROM products ORDER BY product_id DESC LIMIT $1 OFFSET $2",
+		"SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products ORDER BY product_id DESC LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -140,7 +140,7 @@ func GetActiveProducts(db *sql.DB) ([]Products, error) {
 func (t *Products) GetProductID(db *sql.DB) error {
 	var parent, line, wfstatus []byte
 
-	err := db.QueryRow("SELECT id, product_id, date, language, origin_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE product_id = $1",
+	err := db.QueryRow("SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE product_id = $1",
 		t.ProductID).Scan(
 		&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus)
 
@@ -176,7 +176,7 @@ func (t *Products) PostProductID(db *sql.DB) error {
 	wfstatus, _ := json.Marshal(t.Wfstatus)
 
 	err := db.QueryRow(
-		"INSERT INTO products(product_id, date, language, origin_language, pattern, product_name, product_type, parent, line, wfstatus) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, origin_language, pattern, product_name, product_type, parent, line, wfstatus) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE products.product_id = $1 RETURNING id",
+		"INSERT INTO products(product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE products.product_id = $1 RETURNING id",
 		t.ProductID, t.Date, t.Language, t.OriginLang, t.Pattern, t.ProductName, t.ProductType, parent, line, wfstatus).Scan(&t.ID)
 
 	if err != nil {
