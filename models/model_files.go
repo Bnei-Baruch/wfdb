@@ -18,11 +18,12 @@ type Files struct {
 	MimeType  string      `json:"mime_type"`
 	UID       string      `json:"uid"`
 	WID       string      `json:"wid"`
+	ProductID string      `json:"product_id"`
 	Props     interface{} `json:"properties"`
 }
 
 func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
-	sqlStatement := `SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties FROM files WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY id`
+	sqlStatement := `SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties FROM files WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -36,7 +37,7 @@ func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
 	for rows.Next() {
 		var a Files
 		var properties []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties); err != nil {
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &a.ProductID, &properties); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &a.Props)
@@ -48,7 +49,7 @@ func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
 
 func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 	rows, err := db.Query(
-		"SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties FROM files ORDER BY id DESC LIMIT $1 OFFSET $2",
+		"SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties FROM files ORDER BY id DESC LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -62,7 +63,7 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 	for rows.Next() {
 		var a Files
 		var properties []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties); err != nil {
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &a.ProductID, &properties); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &a.Props)
@@ -75,8 +76,8 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 func (a *Files) GetFile(db *sql.DB) error {
 	var properties []byte
 
-	err := db.QueryRow("SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, proertires FROM files WHERE file_id = $1",
-		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties)
+	err := db.QueryRow("SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties FROM files WHERE file_id = $1",
+		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &a.ProductID, &properties)
 	json.Unmarshal(properties, &a.Props)
 
 	if err != nil {
@@ -89,8 +90,8 @@ func (a *Files) GetFile(db *sql.DB) error {
 func (a *Files) PostFile(db *sql.DB) error {
 	properties, _ := json.Marshal(a.Props)
 	err := db.QueryRow(
-		"INSERT INTO files(file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, properties) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE files.sha1 = $7 RETURNING id",
-		&a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &properties).Scan(&a.ID)
+		"INSERT INTO files(file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE files.sha1 = $7 RETURNING id",
+		&a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &a.ProductID, &properties).Scan(&a.ID)
 
 	if err != nil {
 		return err
