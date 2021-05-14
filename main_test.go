@@ -164,6 +164,22 @@ wfstatus jsonb,
 CONSTRAINT job_pkey PRIMARY KEY (job_id)
 )`
 
+const createProductsTable = `CREATE TABLE IF NOT EXISTS products
+(
+id BIGSERIAL,
+product_id TEXT NOT NULL,
+date VARCHAR(10),
+language VARCHAR(10) NOT NULL,
+original_language VARCHAR(10) NOT NULL,
+pattern TEXT,
+product_name TEXT,
+product_type TEXT,
+parent jsonb,
+line jsonb,
+wfstatus jsonb,
+CONSTRAINT product_pkey PRIMARY KEY (product_id)
+)`
+
 const createArchiveTable = `CREATE TABLE IF NOT EXISTS archive
 (
 id BIGSERIAL,

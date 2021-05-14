@@ -225,6 +225,17 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/jobs", a.GetActiveJobs).Methods("GET")
 	a.Router.HandleFunc("/jobs/find", a.FindJob).Methods("GET")
 	a.Router.HandleFunc("/jobs/{jsonb}", a.FindJobByJSON).Methods("GET")
+	// Products
+	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.PostProductID).Methods("PUT")
+	a.Router.HandleFunc("/products/{id:p[0-9]+}/wfstatus/{jsonb}", a.PostProductValue).Methods("POST")
+	a.Router.HandleFunc("/products/{id:p[0-9]+}/{jsonb}", a.PostProductJSON).Methods("POST")
+	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.GetProductID).Methods("GET")
+	a.Router.HandleFunc("/products/{id:[0-9]+}", a.GetProductByID).Methods("GET")
+	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.DeleteProductID).Methods("DELETE")
+	a.Router.HandleFunc("/products", a.GetListProducts).Methods("GET")
+	a.Router.HandleFunc("/product", a.GetActiveProducts).Methods("GET")
+	a.Router.HandleFunc("/products/find", a.FindProduct).Methods("GET")
+	a.Router.HandleFunc("/products/{jsonb}", a.FindProductByJSON).Methods("GET")
 	// Files
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.PostFile).Methods("PUT")
 	a.Router.HandleFunc("/files/{id:[a-z0-9_-]+\\.[a-z0-9]+}", a.GetFile).Methods("GET")
