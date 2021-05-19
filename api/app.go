@@ -233,10 +233,10 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.GetProductID).Methods("GET")
 	a.Router.HandleFunc("/products/{id:[0-9]+}", a.GetProductByID).Methods("GET")
 	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.DeleteProductID).Methods("DELETE")
-	a.Router.HandleFunc("/products/{language}", a.GetListProducts).Methods("GET")
-	a.Router.HandleFunc("/product", a.GetActiveProducts).Methods("GET")
+	a.Router.HandleFunc("/products", a.GetListProducts).Methods("GET")
+	a.Router.HandleFunc("/products/{language}", a.GetActiveProducts).Methods("GET")
 	a.Router.HandleFunc("/products/find", a.FindProduct).Methods("GET")
-	a.Router.HandleFunc("/products/{jsonb}", a.FindProductByJSON).Methods("GET")
+	//a.Router.HandleFunc("/products/{jsonb}", a.FindProductByJSON).Methods("GET")
 	// Files
 	a.Router.HandleFunc("/files/{id:f[0-9]+}", a.PostFile).Methods("PUT")
 	a.Router.HandleFunc("/files/{id:f[0-9]+}", a.GetFile).Methods("GET")
