@@ -109,9 +109,9 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 	return objects, nil
 }
 
-func GetActiveProducts(db *sql.DB) ([]Products, error) {
+func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT * FROM products WHERE wfstatus ->> 'removed' = 'false' ORDER BY product_id")
+		"SELECT * FROM products WHERE wfstatus ->> 'removed' = 'false' AND line ->> 'language' = $1 ORDER BY product_id", language)
 
 	if err != nil {
 		return nil, err
@@ -195,15 +195,15 @@ func (t *Products) PostProductJSON(db *sql.DB, jsonb interface{}, key string) er
 	return err
 }
 
-func (t *Products) PostLineJSON(db *sql.DB, value interface{}, key string, prop string) error {
+func (t *Products) SetProductJSON(db *sql.DB, value interface{}, key string, prop string) error {
 	v, _ := json.Marshal(value)
-	_, err := db.Exec("UPDATE products SET $4 = $4 || json_build_object($3::text, $2::jsonb)::jsonb WHERE product_id=$1",
-		t.ProductID, v, key, prop)
+	sqlCmd := "UPDATE products SET " + prop + " = " + prop + " || json_build_object($3::text, $2::jsonb)::jsonb WHERE product_id=$1"
+	_, err := db.Exec(sqlCmd, t.ProductID, v, key)
 
 	return err
 }
 
-func (t *Products) PostProductValue(db *sql.DB, value, key string) error {
+func (t *Products) PostProductStatus(db *sql.DB, value, key string) error {
 
 	_, err := db.Exec("UPDATE products SET wfstatus = wfstatus || json_build_object($3::text, $2::bool)::jsonb WHERE product_id=$1",
 		t.ProductID, value, key)

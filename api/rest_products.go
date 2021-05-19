@@ -12,8 +12,8 @@ import (
 )
 
 func (a *App) FindProduct(w http.ResponseWriter, r *http.Request) {
-	key := r.FormValue("key")
-	value := r.FormValue("value")
+	key := r.FormValue("id")
+	value := r.FormValue("line")
 
 	files, err := models.FindProduct(a.DB, key, value)
 	if err != nil {
@@ -60,8 +60,10 @@ func (a *App) GetListProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) GetActiveProducts(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	language := vars["language"]
 
-	files, err := models.GetActiveProducts(a.DB)
+	files, err := models.GetActiveProducts(a.DB, language)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -150,7 +152,7 @@ func (a *App) PostProductJSON(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) PostLineJSON(w http.ResponseWriter, r *http.Request) {
+func (a *App) SetProductJSON(w http.ResponseWriter, r *http.Request) {
 	var t models.Products
 	vars := mux.Vars(r)
 	t.ProductID = vars["id"]
@@ -164,7 +166,7 @@ func (a *App) PostLineJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := t.PostLineJSON(a.DB, value, key, prop); err != nil {
+	if err := t.SetProductJSON(a.DB, value, key, prop); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -172,14 +174,14 @@ func (a *App) PostLineJSON(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-func (a *App) PostProductValue(w http.ResponseWriter, r *http.Request) {
+func (a *App) PostProductStatus(w http.ResponseWriter, r *http.Request) {
 	var t models.Products
 	vars := mux.Vars(r)
 	t.ProductID = vars["id"]
-	key := vars["jsonb"]
+	key := r.FormValue("key")
 	value := r.FormValue("value")
 
-	if err := t.PostProductValue(a.DB, value, key); err != nil {
+	if err := t.PostProductStatus(a.DB, value, key); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
