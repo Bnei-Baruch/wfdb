@@ -150,6 +150,28 @@ func (a *App) PostProductJSON(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) PostLineJSON(w http.ResponseWriter, r *http.Request) {
+	var t models.Products
+	vars := mux.Vars(r)
+	t.ProductID = vars["id"]
+	key := vars["jsonb"]
+	prop := vars["prop"]
+	var value map[string]interface{}
+	d := json.NewDecoder(r.Body)
+
+	if err := d.Decode(&value); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
+		return
+	}
+
+	if err := t.PostLineJSON(a.DB, value, key, prop); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func (a *App) PostProductValue(w http.ResponseWriter, r *http.Request) {
 	var t models.Products
 	vars := mux.Vars(r)

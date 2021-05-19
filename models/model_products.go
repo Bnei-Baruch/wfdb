@@ -195,6 +195,14 @@ func (t *Products) PostProductJSON(db *sql.DB, jsonb interface{}, key string) er
 	return err
 }
 
+func (t *Products) PostLineJSON(db *sql.DB, value interface{}, key string, prop string) error {
+	v, _ := json.Marshal(value)
+	_, err := db.Exec("UPDATE products SET $4 = $4 || json_build_object($3::text, $2::jsonb)::jsonb WHERE product_id=$1",
+		t.ProductID, v, key, prop)
+
+	return err
+}
+
 func (t *Products) PostProductValue(db *sql.DB, value, key string) error {
 
 	_, err := db.Exec("UPDATE products SET wfstatus = wfstatus || json_build_object($3::text, $2::bool)::jsonb WHERE product_id=$1",
