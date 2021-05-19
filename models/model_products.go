@@ -111,7 +111,7 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 
 func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT * FROM products WHERE wfstatus ->> 'removed' = 'false' AND line ->> 'language' = $1 ORDER BY product_id", language)
+		"SELECT * FROM products WHERE wfstatus ->> 'removed' = 'false' AND line ->> $1 IS NOT NULL ORDER BY product_id", language)
 
 	if err != nil {
 		return nil, err
