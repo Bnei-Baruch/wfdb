@@ -75,7 +75,7 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 
 func GetActiveFiles(db *sql.DB, language string, product_id string) ([]Files, error) {
 	rows, err := db.Query(
-		"SELECT * FROM files WHERE language = $1 AND product_id = $2 ORDER BY file_id", language, product_id)
+		"SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties FROM files WHERE language = $1 AND product_id = $2 ORDER BY file_id", language, product_id)
 
 	if err != nil {
 		return nil, err
