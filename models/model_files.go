@@ -73,6 +73,32 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 	return o, nil
 }
 
+func GetActiveFiles(db *sql.DB, language string, product_id string) ([]Files, error) {
+	rows, err := db.Query(
+		"SELECT * FROM files WHERE language = $1 AND product_id = $2 ORDER BY file_id", language, product_id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	objects := []Files{}
+
+	for rows.Next() {
+		var a Files
+		var properties []byte
+		if err := rows.Scan(
+			&a.ID, &a.FileID, &a.Date, &a.Language, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.MimeType, &a.UID, &a.WID, &a.ProductID, &properties); err != nil {
+			return nil, err
+		}
+		json.Unmarshal(properties, &a.Props)
+		objects = append(objects, a)
+	}
+
+	return objects, nil
+}
+
 func (a *Files) GetFile(db *sql.DB) error {
 	var properties []byte
 

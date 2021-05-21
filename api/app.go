@@ -241,9 +241,11 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/files/{id:f[0-9]+}", a.PostFile).Methods("PUT")
 	a.Router.HandleFunc("/files/{id:f[0-9]+}", a.GetFile).Methods("GET")
 	a.Router.HandleFunc("/files/{id:f[0-9]+}", a.DeleteFile).Methods("DELETE")
-	a.Router.HandleFunc("/files/{id:f[0-9]+}/properties/{jsonb}", a.PostFileJSON).Methods("PUT")
-	a.Router.HandleFunc("/files/{id:f[0-9]+}/properties/{jsonb}", a.PostFileValue).Methods("POST")
+	a.Router.HandleFunc("/files/{id:f[0-9]+}/json/{jsonb}", a.PostFileJSON).Methods("PUT")
+	a.Router.HandleFunc("/files/{id:f[0-9]+}/json/{jsonb}", a.PostFileValue).Methods("POST")
+	a.Router.HandleFunc("/files/{id:f[0-9]+}/status/{jsonb}", a.PostFileStatus).Methods("POST")
 	a.Router.HandleFunc("/files", a.GetFiles).Methods("GET")
+	a.Router.HandleFunc("/files/{language}", a.GetActiveFiles).Methods("GET")
 	a.Router.HandleFunc("/files/find", a.FindFiles).Methods("GET")
 	// Tasks
 	a.Router.HandleFunc("/task", a.PostTask).Methods("POST")

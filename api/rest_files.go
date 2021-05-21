@@ -44,6 +44,20 @@ func (a *App) GetFiles(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) GetActiveFiles(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	language := vars["language"]
+	product_id := r.FormValue("product_id")
+
+	files, err := models.GetActiveFiles(a.DB, language, product_id)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, files)
+}
+
 func (a *App) GetFile(w http.ResponseWriter, r *http.Request) {
 	var k models.Files
 	vars := mux.Vars(r)
@@ -83,24 +97,31 @@ func (a *App) PostFile(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+func (a *App) PostFileStatus(w http.ResponseWriter, r *http.Request) {
+	var s models.Files
+	vars := mux.Vars(r)
+	s.FileID = vars["id"]
+	key := vars["jsonb"]
+	value := r.FormValue("value")
+
+	if err := s.PostFileStatus(a.DB, value, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func (a *App) PostFileValue(w http.ResponseWriter, r *http.Request) {
 	var s models.Files
 	vars := mux.Vars(r)
 	s.FileID = vars["id"]
 	key := vars["jsonb"]
 	value := r.FormValue("value")
-	body := r.FormValue("body")
 
-	if value == "" {
-		if err := s.PostFileValue(a.DB, body, key); err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-	} else {
-		if err := s.PostFileStatus(a.DB, value, key); err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+	if err := s.PostFileValue(a.DB, value, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
