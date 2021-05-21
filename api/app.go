@@ -229,7 +229,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.PostProductID).Methods("PUT")
 	a.Router.HandleFunc("/products/{id:p[0-9]+}/status", a.PostProductStatus).Methods("POST")
 	a.Router.HandleFunc("/products/{id:p[0-9]+}/{prop}/{jsonb}", a.SetProductJSON).Methods("POST")
-	//a.Router.HandleFunc("/products/{id:p[0-9]+}/{jsonb}", a.PostProductJSON).Methods("POST")
+	a.Router.HandleFunc("/products/{id:p[0-9]+}/{jsonb}", a.PostProductJSON).Methods("PUT")
 	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.GetProductID).Methods("GET")
 	a.Router.HandleFunc("/products/{id:[0-9]+}", a.GetProductByID).Methods("GET")
 	a.Router.HandleFunc("/products/{id:p[0-9]+}", a.DeleteProductID).Methods("DELETE")

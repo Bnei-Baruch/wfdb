@@ -170,13 +170,14 @@ id BIGSERIAL,
 product_id TEXT NOT NULL,
 date VARCHAR(10),
 language VARCHAR(10) NOT NULL,
-original_language VARCHAR(10) NOT NULL,
+type_id TEXT,
 pattern TEXT,
 product_name TEXT,
 product_type TEXT,
+i18n jsonb,
 parent jsonb,
 line jsonb,
-wfstatus jsonb,
+properties jsonb,
 CONSTRAINT product_pkey PRIMARY KEY (product_id)
 )`
 
