@@ -11,13 +11,14 @@ type Products struct {
 	ProductID   string      `json:"product_id"`
 	Date        string      `json:"date"`
 	Language    string      `json:"language"`
-	OriginLang  string      `json:"original_language"`
 	Pattern     string      `json:"pattern"`
+	TypeID      string      `json:"type_id"`
 	ProductName string      `json:"product_name"`
 	ProductType string      `json:"product_type"`
+	I18n        interface{} `json:"i18n"`
 	Parent      interface{} `json:"parent"`
 	Line        interface{} `json:"line"`
-	Wfstatus    interface{} `json:"wfstatus"`
+	Props       interface{} `json:"properties"`
 }
 
 func FindProduct(db *sql.DB, key string, value string) ([]Products, error) {
@@ -34,14 +35,15 @@ func FindProduct(db *sql.DB, key string, value string) ([]Products, error) {
 
 	for rows.Next() {
 		var t Products
-		var parent, line, wfstatus []byte
+		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
 			return nil, err
 		}
+		json.Unmarshal(i18n, &t.I18n)
 		json.Unmarshal(parent, &t.Parent)
 		json.Unmarshal(line, &t.Line)
-		json.Unmarshal(wfstatus, &t.Wfstatus)
+		json.Unmarshal(properties, &t.Props)
 		objects = append(objects, t)
 	}
 
@@ -50,7 +52,7 @@ func FindProduct(db *sql.DB, key string, value string) ([]Products, error) {
 
 func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Products, error) {
 
-	sqlStatement := fmt.Sprintf("SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE %s ->> '%s' = '%s' ORDER BY product_id;", ep, key, value)
+	sqlStatement := fmt.Sprintf("SELECT * FROM products WHERE %s ->> '%s' = '%s' ORDER BY product_id;", ep, key, value)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -62,14 +64,15 @@ func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Produ
 
 	for rows.Next() {
 		var t Products
-		var parent, line, wfstatus []byte
+		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
 			return nil, err
 		}
+		json.Unmarshal(i18n, &t.I18n)
 		json.Unmarshal(parent, &t.Parent)
 		json.Unmarshal(line, &t.Line)
-		json.Unmarshal(wfstatus, &t.Wfstatus)
+		json.Unmarshal(properties, &t.Props)
 		objects = append(objects, t)
 	}
 
@@ -82,7 +85,7 @@ func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Produ
 
 func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products ORDER BY product_id DESC LIMIT $1 OFFSET $2",
+		"SELECT * FROM products ORDER BY product_id DESC LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -95,14 +98,15 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 
 	for rows.Next() {
 		var t Products
-		var parent, line, wfstatus []byte
+		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
 			return nil, err
 		}
+		json.Unmarshal(i18n, &t.I18n)
 		json.Unmarshal(parent, &t.Parent)
 		json.Unmarshal(line, &t.Line)
-		json.Unmarshal(wfstatus, &t.Wfstatus)
+		json.Unmarshal(properties, &t.Props)
 		objects = append(objects, t)
 	}
 
@@ -111,7 +115,7 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 
 func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT * FROM products WHERE wfstatus ->> 'removed' = 'false' AND line ->> $1 IS NOT NULL ORDER BY product_id", language)
+		"SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND line ->> $1 IS NOT NULL ORDER BY product_id", language)
 
 	if err != nil {
 		return nil, err
@@ -123,14 +127,15 @@ func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 
 	for rows.Next() {
 		var t Products
-		var parent, line, wfstatus []byte
+		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
 			return nil, err
 		}
+		json.Unmarshal(i18n, &t.I18n)
 		json.Unmarshal(parent, &t.Parent)
 		json.Unmarshal(line, &t.Line)
-		json.Unmarshal(wfstatus, &t.Wfstatus)
+		json.Unmarshal(properties, &t.Props)
 		objects = append(objects, t)
 	}
 
@@ -138,15 +143,15 @@ func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 }
 
 func (t *Products) GetProductID(db *sql.DB) error {
-	var parent, line, wfstatus []byte
+	var i18n, parent, line, properties []byte
 
-	err := db.QueryRow("SELECT id, product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus FROM products WHERE product_id = $1",
+	err := db.QueryRow("SELECT * FROM products WHERE product_id = $1",
 		t.ProductID).Scan(
-		&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus)
-
+		&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties)
+	json.Unmarshal(i18n, &t.I18n)
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
-	json.Unmarshal(wfstatus, &t.Wfstatus)
+	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
 	}
@@ -155,14 +160,14 @@ func (t *Products) GetProductID(db *sql.DB) error {
 }
 
 func (t *Products) GetProductByID(db *sql.DB) error {
-	var parent, line, wfstatus []byte
+	var i18n, parent, line, properties []byte
 
-	err := db.QueryRow("SELECT id, product_id, date, pattern, product_name, product_type, parent, line, departments, proxy, product, wfstatus FROM products WHERE id = $1",
-		t.ID).Scan(&t.ID, &t.ProductID, &t.Date, &t.Language, &t.OriginLang, &t.Pattern, &t.ProductName, &t.ProductType, &parent, &line, &wfstatus)
-
+	err := db.QueryRow("SELECT * FROM products WHERE id = $1",
+		t.ID).Scan(&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties)
+	json.Unmarshal(i18n, &t.I18n)
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
-	json.Unmarshal(wfstatus, &t.Wfstatus)
+	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
 	}
@@ -171,13 +176,14 @@ func (t *Products) GetProductByID(db *sql.DB) error {
 }
 
 func (t *Products) PostProductID(db *sql.DB) error {
+	i18n, _ := json.Marshal(t.I18n)
 	parent, _ := json.Marshal(t.Parent)
 	line, _ := json.Marshal(t.Line)
-	wfstatus, _ := json.Marshal(t.Wfstatus)
+	properties, _ := json.Marshal(t.Props)
 
 	err := db.QueryRow(
-		"INSERT INTO products(product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, original_language, pattern, product_name, product_type, parent, line, wfstatus) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) WHERE products.product_id = $1 RETURNING id",
-		t.ProductID, t.Date, t.Language, t.OriginLang, t.Pattern, t.ProductName, t.ProductType, parent, line, wfstatus).Scan(&t.ID)
+		"INSERT INTO products(product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) WHERE products.product_id = $1 RETURNING id",
+		t.ProductID, t.Date, t.Language, t.TypeID, t.Pattern, t.ProductName, t.ProductType, i18n, parent, line, properties).Scan(&t.ID)
 
 	if err != nil {
 		return err
@@ -205,7 +211,7 @@ func (t *Products) SetProductJSON(db *sql.DB, value interface{}, key string, pro
 
 func (t *Products) PostProductStatus(db *sql.DB, value, key string) error {
 
-	_, err := db.Exec("UPDATE products SET wfstatus = wfstatus || json_build_object($3::text, $2::bool)::jsonb WHERE product_id=$1",
+	_, err := db.Exec("UPDATE products SET properties = properties || json_build_object($3::text, $2::bool)::jsonb WHERE product_id=$1",
 		t.ProductID, value, key)
 
 	return err
