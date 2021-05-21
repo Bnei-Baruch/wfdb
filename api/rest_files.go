@@ -49,6 +49,10 @@ func (a *App) GetActiveFiles(w http.ResponseWriter, r *http.Request) {
 	language := vars["language"]
 	product_id := r.FormValue("product_id")
 
+	if language == "find" {
+		return
+	}
+
 	files, err := models.GetActiveFiles(a.DB, language, product_id)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
