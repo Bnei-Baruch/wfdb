@@ -12,10 +12,9 @@ import (
 )
 
 func (a *App) FindProduct(w http.ResponseWriter, r *http.Request) {
-	key := r.FormValue("id")
-	value := r.FormValue("line")
+	values := r.URL.Query()
 
-	files, err := models.FindProduct(a.DB, key, value)
+	files, err := models.FindProduct(a.DB, values)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -62,6 +61,10 @@ func (a *App) GetListProducts(w http.ResponseWriter, r *http.Request) {
 func (a *App) GetActiveProducts(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	language := vars["language"]
+
+	if language == "find" {
+		return
+	}
 
 	files, err := models.GetActiveProducts(a.DB, language)
 	if err != nil {

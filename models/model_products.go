@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type Products struct {
@@ -21,8 +23,16 @@ type Products struct {
 	Props       interface{} `json:"properties"`
 }
 
-func FindProduct(db *sql.DB, key string, value string) ([]Products, error) {
-	sqlStatement := `SELECT * FROM products WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY product_id`
+func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
+
+	var where []string
+
+	for k, v := range values {
+		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
+	}
+
+	sqlStatement := ("SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND "))
+	//sqlStatement := `SELECT * FROM products WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY product_id`
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
