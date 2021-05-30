@@ -3,6 +3,9 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"net/url"
+	"strings"
 )
 
 type Files struct {
@@ -22,8 +25,16 @@ type Files struct {
 	Props     interface{} `json:"properties"`
 }
 
-func FindFiles(db *sql.DB, key string, value string) ([]Files, error) {
-	sqlStatement := `SELECT id, file_id, date, language, file_name, extension, size, sha1, file_type, mime_type, uid, wid, product_id, properties FROM files WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY id`
+func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
+
+	var where []string
+
+	for k, v := range values {
+		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
+	}
+
+	sqlStatement := ("SELECT * FROM files WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND "))
+	//sqlStatement := ("SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND "))
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
