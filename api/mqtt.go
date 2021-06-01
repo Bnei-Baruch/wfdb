@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Bnei-Baruch/wfdb/common"
+	"github.com/Bnei-Baruch/wfdb/models"
 	"github.com/eclipse/paho.mqtt.golang"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"strings"
+	"time"
 )
 
 type MqttPayload struct {
@@ -99,6 +101,37 @@ func (a *App) SendRespond(id string, m *MqttPayload) {
 	text := fmt.Sprintf(string(message))
 	if token := a.Msg.Publish(topic, byte(2), false, text); token.Wait() && token.Error() != nil {
 		log.Error().Str("source", "MQTT").Err(err).Msg("Send Respond")
+	}
+}
+
+func (a *App) ReportMonitor(id string) {
+	var topic string
+	var m interface{}
+	date := time.Now().Format("2006-01-02")
+
+	if id == "ingest" {
+		topic = common.MonitorIngestTopic
+		m, _ = models.FindIngest(a.DB, "date", date)
+	}
+
+	if id == "trimmer" {
+		topic = common.MonitorTrimmerTopic
+		m, _ = models.FindTrimmer(a.DB, "date", date)
+	}
+
+	if id == "archive" {
+		topic = common.MonitorArchiveTopic
+		m, _ = models.FindKmFiles(a.DB, "date", date)
+	}
+
+	message, err := json.Marshal(m)
+	if err != nil {
+		log.Error().Str("monitor", "MQTT").Err(err).Msg("Message parsing")
+	}
+
+	text := fmt.Sprintf(string(message))
+	if token := a.Msg.Publish(topic, byte(0), true, text); token.Wait() && token.Error() != nil {
+		log.Error().Str("monitor", "MQTT").Err(err).Msg("Report Monitor")
 	}
 }
 

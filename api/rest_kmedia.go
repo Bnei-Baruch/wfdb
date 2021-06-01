@@ -80,6 +80,8 @@ func (a *App) PostKmFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("archive")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -92,6 +94,8 @@ func (a *App) DeleteKmFile(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.ReportMonitor("archive")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }

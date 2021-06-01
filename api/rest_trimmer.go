@@ -136,6 +136,8 @@ func (a *App) PostTrimmerID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("trimmer")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -159,6 +161,8 @@ func (a *App) PostTrimmerJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("trimmer")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -174,6 +178,8 @@ func (a *App) PostTrimmerValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("trimmer")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -186,6 +192,8 @@ func (a *App) DeleteTrimmerID(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.ReportMonitor("trimmer")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }

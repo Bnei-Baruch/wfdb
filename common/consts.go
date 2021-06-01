@@ -25,6 +25,9 @@ var (
 )
 
 const (
-	ExtPrefix        = "kli/"
-	ServiceDataTopic = "wfdb/service/data/"
+	ExtPrefix           = "kli/"
+	ServiceDataTopic    = "wfdb/service/data/"
+	MonitorIngestTopic  = "wfdb/service/ingest/monitor"
+	MonitorTrimmerTopic = "wfdb/service/trimmer/monitor"
+	MonitorArchiveTopic = "wfdb/service/archive/monitor"
 )

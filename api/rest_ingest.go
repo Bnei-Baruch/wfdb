@@ -80,6 +80,8 @@ func (a *App) PostIngestID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("ingest")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -103,6 +105,8 @@ func (a *App) PostIngestJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("ingest")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -120,6 +124,8 @@ func (a *App) PostIngestValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.ReportMonitor("ingest")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -132,6 +138,8 @@ func (a *App) DeleteIngestID(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.ReportMonitor("ingest")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
