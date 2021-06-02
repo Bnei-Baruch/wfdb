@@ -33,4 +33,5 @@ const (
 	StateTrimmerTopic   = "wfdb/service/trimmer/state"
 	StateDgimaTopic     = "wfdb/service/dgima/state"
 	StateArichaTopic    = "wfdb/service/aricha/state"
+	StateLangcheckTopic = "wfdb/service/langcheck/state"
 )

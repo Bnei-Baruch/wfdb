@@ -139,6 +139,13 @@ func (a *App) SendMessage(id string) {
 		m, _ = models.GetBdika(a.DB)
 	}
 
+	if id == "langcheck" {
+		topic = common.StateLangcheckTopic
+		var s models.State
+		_ = s.GetState(a.DB)
+		m = s.Data
+	}
+
 	message, err := json.Marshal(m)
 	if err != nil {
 		log.Error().Str("monitor", "MQTT").Err(err).Msg("Message parsing")

@@ -168,6 +168,8 @@ func (a *App) PostStateJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("langcheck")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
