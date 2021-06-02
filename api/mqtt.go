@@ -104,7 +104,7 @@ func (a *App) SendRespond(id string, m *MqttPayload) {
 	}
 }
 
-func (a *App) ReportMonitor(id string) {
+func (a *App) SendMessage(id string) {
 	var topic string
 	var m interface{}
 	date := time.Now().Format("2006-01-02")
@@ -122,6 +122,21 @@ func (a *App) ReportMonitor(id string) {
 	if id == "archive" {
 		topic = common.MonitorArchiveTopic
 		m, _ = models.FindKmFiles(a.DB, "date", date)
+	}
+
+	if id == "trim" {
+		topic = common.StateTrimmerTopic
+		m, _ = models.GetFilesToTrim(a.DB)
+	}
+
+	if id == "drim" {
+		topic = common.StateDgimaTopic
+		m, _ = models.GetFilesToDgima(a.DB)
+	}
+
+	if id == "bdika" {
+		topic = common.StateArichaTopic
+		m, _ = models.GetBdika(a.DB)
 	}
 
 	message, err := json.Marshal(m)

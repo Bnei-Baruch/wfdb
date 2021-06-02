@@ -137,6 +137,8 @@ func (a *App) PostArichaID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("bdika")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -160,6 +162,8 @@ func (a *App) PostArichaJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("bdika")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -175,6 +179,8 @@ func (a *App) PostArichaValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("bdika")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -187,6 +193,8 @@ func (a *App) DeleteArichaID(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.SendMessage("bdika")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }

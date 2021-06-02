@@ -30,4 +30,7 @@ const (
 	MonitorIngestTopic  = "wfdb/service/ingest/monitor"
 	MonitorTrimmerTopic = "wfdb/service/trimmer/monitor"
 	MonitorArchiveTopic = "wfdb/service/archive/monitor"
+	StateTrimmerTopic   = "wfdb/service/trimmer/state"
+	StateDgimaTopic     = "wfdb/service/dgima/state"
+	StateArichaTopic    = "wfdb/service/aricha/state"
 )

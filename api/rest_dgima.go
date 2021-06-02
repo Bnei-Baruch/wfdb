@@ -161,6 +161,8 @@ func (a *App) PostDgimaID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("drim")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -184,6 +186,8 @@ func (a *App) PostDgimaJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("drim")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -199,6 +203,8 @@ func (a *App) PostDgimaValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("drim")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -211,6 +217,8 @@ func (a *App) DeleteDgimaID(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.SendMessage("drim")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
