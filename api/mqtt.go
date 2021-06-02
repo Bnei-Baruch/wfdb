@@ -142,6 +142,7 @@ func (a *App) SendMessage(id string) {
 	if id == "langcheck" {
 		topic = common.StateLangcheckTopic
 		var s models.State
+		s.StateID = "langcheck"
 		_ = s.GetState(a.DB)
 		m = s.Data
 	}
