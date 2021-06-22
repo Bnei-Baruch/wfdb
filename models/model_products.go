@@ -26,13 +26,30 @@ type Products struct {
 func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 
 	var where []string
+	var sqlStatement string
+	limit := "10"
+	offset := "0"
 
 	for k, v := range values {
+		if k == "limit" {
+			limit = v[0]
+			continue
+		}
+		if k == "offset" {
+			offset = v[0]
+			continue
+		}
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
 	}
 
-	sqlStatement := ("SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND "))
-	//sqlStatement := `SELECT * FROM products WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY product_id`
+	if len(where) == 0 {
+		sqlStatement = "SELECT * FROM products WHERE properties ->> 'removed' = 'false'"
+	} else {
+		sqlStatement = "SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND ")
+	}
+
+	sqlStatement = sqlStatement + fmt.Sprintf(` ORDER BY product_id DESC LIMIT %s OFFSET %s`, limit, offset)
+
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
