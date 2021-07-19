@@ -21,6 +21,7 @@ type Products struct {
 	Parent      interface{} `json:"parent"`
 	Line        interface{} `json:"line"`
 	Props       interface{} `json:"properties"`
+	FilmDate    string      `json:"film_date"`
 }
 
 func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
@@ -64,7 +65,7 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 		var t Products
 		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(i18n, &t.I18n)
@@ -93,7 +94,7 @@ func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Produ
 		var t Products
 		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(i18n, &t.I18n)
@@ -127,7 +128,7 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 		var t Products
 		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(i18n, &t.I18n)
@@ -156,7 +157,7 @@ func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 		var t Products
 		var i18n, parent, line, properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties); err != nil {
+			&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(i18n, &t.I18n)
@@ -174,7 +175,7 @@ func (t *Products) GetProductID(db *sql.DB) error {
 
 	err := db.QueryRow("SELECT * FROM products WHERE product_id = $1",
 		t.ProductID).Scan(
-		&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties)
+		&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate)
 	json.Unmarshal(i18n, &t.I18n)
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
@@ -190,7 +191,7 @@ func (t *Products) GetProductByID(db *sql.DB) error {
 	var i18n, parent, line, properties []byte
 
 	err := db.QueryRow("SELECT * FROM products WHERE id = $1",
-		t.ID).Scan(&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties)
+		t.ID).Scan(&t.ID, &t.ProductID, &t.Date, &t.Language, &t.TypeID, &t.Pattern, &t.ProductName, &t.ProductType, &i18n, &parent, &line, &properties, &t.FilmDate)
 	json.Unmarshal(i18n, &t.I18n)
 	json.Unmarshal(parent, &t.Parent)
 	json.Unmarshal(line, &t.Line)
@@ -209,8 +210,8 @@ func (t *Products) PostProductID(db *sql.DB) error {
 	properties, _ := json.Marshal(t.Props)
 
 	err := db.QueryRow(
-		"INSERT INTO products(product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) WHERE products.product_id = $1 RETURNING id",
-		t.ProductID, t.Date, t.Language, t.TypeID, t.Pattern, t.ProductName, t.ProductType, i18n, parent, line, properties).Scan(&t.ID)
+		"INSERT INTO products(product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties, film_date) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (product_id) DO UPDATE SET (product_id, date, language, type_id, pattern, product_name, product_type, i18n, parent, line, properties, film_date) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE products.product_id = $1 RETURNING id",
+		t.ProductID, t.Date, t.Language, t.TypeID, t.Pattern, t.ProductName, t.ProductType, i18n, parent, line, properties, t.FilmDate).Scan(&t.ID)
 
 	if err != nil {
 		return err
