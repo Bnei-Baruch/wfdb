@@ -23,6 +23,7 @@ type Files struct {
 	WID       string      `json:"wid"`
 	Props     interface{} `json:"properties"`
 	ProductID string      `json:"product_id"`
+	MediaInfo interface{} `json:"media_info"`
 }
 
 func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
@@ -47,11 +48,12 @@ func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 
 	for rows.Next() {
 		var a Files
-		var properties []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID); err != nil {
+		var properties, media_info []byte
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID, &media_info); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &a.Props)
+		json.Unmarshal(media_info, &a.MediaInfo)
 		o = append(o, a)
 	}
 
@@ -73,11 +75,12 @@ func GetFiles(db *sql.DB, start, count int) ([]Files, error) {
 
 	for rows.Next() {
 		var a Files
-		var properties []byte
-		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID); err != nil {
+		var properties, media_info []byte
+		if err := rows.Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID, &media_info); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &a.Props)
+		json.Unmarshal(media_info, &a.MediaInfo)
 		o = append(o, a)
 	}
 
@@ -98,9 +101,9 @@ func GetActiveFiles(db *sql.DB, language string, product_id string) ([]Files, er
 
 	for rows.Next() {
 		var a Files
-		var properties []byte
+		var properties, media_info []byte
 		if err := rows.Scan(
-			&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID); err != nil {
+			&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID, &media_info); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &a.Props)
@@ -111,11 +114,12 @@ func GetActiveFiles(db *sql.DB, language string, product_id string) ([]Files, er
 }
 
 func (a *Files) GetFile(db *sql.DB) error {
-	var properties []byte
+	var properties, media_info []byte
 
 	err := db.QueryRow("SELECT * FROM files WHERE file_id = $1",
 		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID)
 	json.Unmarshal(properties, &a.Props)
+	json.Unmarshal(media_info, &a.MediaInfo)
 
 	if err != nil {
 		return err
@@ -126,9 +130,10 @@ func (a *Files) GetFile(db *sql.DB) error {
 
 func (a *Files) PostFile(db *sql.DB) error {
 	properties, _ := json.Marshal(a.Props)
+	media_info, _ := json.Marshal(a.MediaInfo)
 	err := db.QueryRow(
-		"INSERT INTO files(file_id, date, file_name, extension, size, sha1, file_type, language,  mime_type, uid, wid, properties, product_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, file_name, extension, size, sha1, file_type, language,  mime_type, uid, wid, properties, product_id) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) WHERE files.sha1 = $7 RETURNING id",
-		&a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID).Scan(&a.ID)
+		"INSERT INTO files(file_id, date, file_name, extension, size, sha1, file_type, language,  mime_type, uid, wid, properties, product_id, media_info) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) ON CONFLICT (sha1) DO UPDATE SET (file_id, date, file_name, extension, size, sha1, file_type, language,  mime_type, uid, wid, properties, product_id, media_info) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) WHERE files.sha1 = $7 RETURNING id",
+		&a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID, &media_info).Scan(&a.ID)
 
 	if err != nil {
 		return err
