@@ -161,7 +161,7 @@ func (a *App) SetProductJSON(w http.ResponseWriter, r *http.Request) {
 	t.ProductID = vars["id"]
 	key := vars["jsonb"]
 	prop := vars["prop"]
-	var value map[string]interface{}
+	var value interface{}
 	d := json.NewDecoder(r.Body)
 
 	if err := d.Decode(&value); err != nil {
