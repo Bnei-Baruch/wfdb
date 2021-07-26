@@ -254,6 +254,14 @@ func (t *Products) PostProductStatus(db *sql.DB, value, key string) error {
 	return err
 }
 
+func (t *Products) PostProductProp(db *sql.DB, value, key string) error {
+
+	_, err := db.Exec("UPDATE products SET properties = properties || json_build_object($3::text, $2::text)::jsonb WHERE product_id=$1",
+		t.ProductID, value, key)
+
+	return err
+}
+
 func (t *Products) DeleteProductID(db *sql.DB) error {
 	_, err := db.Exec("DELETE FROM products WHERE product_id=$1", t.ProductID)
 

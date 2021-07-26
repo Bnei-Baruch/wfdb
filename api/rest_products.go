@@ -161,7 +161,8 @@ func (a *App) SetProductJSON(w http.ResponseWriter, r *http.Request) {
 	t.ProductID = vars["id"]
 	key := vars["jsonb"]
 	prop := vars["prop"]
-	var value interface{}
+	value := r.FormValue("value")
+	//var value interface{}
 	d := json.NewDecoder(r.Body)
 
 	if err := d.Decode(&value); err != nil {
@@ -185,6 +186,21 @@ func (a *App) PostProductStatus(w http.ResponseWriter, r *http.Request) {
 	value := r.FormValue("value")
 
 	if err := t.PostProductStatus(a.DB, value, key); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func (a *App) PostProductProp(w http.ResponseWriter, r *http.Request) {
+	var t models.Products
+	vars := mux.Vars(r)
+	t.ProductID = vars["id"]
+	key := r.FormValue("key")
+	value := r.FormValue("value")
+
+	if err := t.PostProductProp(a.DB, value, key); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
