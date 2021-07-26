@@ -231,16 +231,8 @@ func (t *Products) PostProductJSON(db *sql.DB, jsonb interface{}, key string) er
 
 func (t *Products) SetProductJSON(db *sql.DB, value interface{}, key string, prop string) error {
 
-	vt := "text"
-	switch value.(type) {
-	case float64:
-		vt = "int"
-	case bool:
-		vt = "bool"
-	}
-
 	v, _ := json.Marshal(value)
-	sqlCmd := "UPDATE products SET " + prop + " = " + prop + " || json_build_object($3::text, $2::" + vt + ")::jsonb WHERE product_id=$1"
+	sqlCmd := "UPDATE products SET " + prop + " = " + prop + " || json_build_object($3::text, $2::jsonb)::jsonb WHERE product_id=$1"
 	_, err := db.Exec(sqlCmd, t.ProductID, v, key)
 
 	return err
