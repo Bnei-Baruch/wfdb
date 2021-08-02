@@ -27,7 +27,7 @@ type Products struct {
 func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 
 	var where []string
-	sqlStatement := "SELECT * FROM products WHERE properties ->> 'removed' = 'false'"
+	var sqlStatement string
 	collection_uid := "0"
 	limit := "10"
 	offset := "0"
@@ -48,10 +48,18 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
 	}
 
-	if collection_uid != "0" {
-		sqlStatement = sqlStatement + " AND line ->> 'collection_uid' == '" + collection_uid + "' AND " + strings.Join(where, " AND ")
+	if len(where) == 0 {
+		sqlStatement = "SELECT * FROM products WHERE properties ->> 'removed' = 'false'"
+	} else if collection_uid != "0" {
+		sqlStatement = "SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND line ->> 'collection_uid' == '" + collection_uid + "' AND " + strings.Join(where, " AND ")
 	} else {
-		sqlStatement = sqlStatement + " AND " + strings.Join(where, " AND ")
+		sqlStatement = "SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND " + strings.Join(where, " AND ")
+	}
+
+	if collection_uid != "0" {
+		sqlStatement = sqlStatement + ` AND line ->> 'collection_uid' == '` + collection_uid + "' AND " + strings.Join(where, " AND ")
+	} else {
+		sqlStatement = sqlStatement + ` AND ` + strings.Join(where, " AND ")
 	}
 
 	sqlStatement = sqlStatement + fmt.Sprintf(` ORDER BY product_id DESC LIMIT %s OFFSET %s`, limit, offset)
