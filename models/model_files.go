@@ -30,7 +30,6 @@ func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 
 	var where []string
 	sqlStatement := `SELECT * FROM files WHERE properties ->> 'removed' = 'false'`
-	var archive string
 
 	limit := "100"
 	offset := "0"
@@ -45,22 +44,14 @@ func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 			continue
 		}
 		if k == "archive" {
-			archive = v[0]
+			where = append(where, fmt.Sprintf(`properties ->> '%s' = '%s'`, k, v[0]))
 			continue
 		}
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
 	}
 
-	if archive == "false" {
-		sqlStatement = sqlStatement + ` AND properties ->> 'archive' != 'true' AND `
-	}
-
-	if archive == "true" {
-		sqlStatement = sqlStatement + ` AND properties ->> 'archive' = 'true' AND `
-	}
-
 	if len(where) > 0 {
-		sqlStatement = sqlStatement + strings.Join(where, " AND ")
+		sqlStatement = sqlStatement + ` AND ` + strings.Join(where, " AND ")
 	}
 
 	sqlStatement = sqlStatement + fmt.Sprintf(` ORDER BY file_id DESC LIMIT %s OFFSET %s`, limit, offset)

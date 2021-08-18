@@ -28,7 +28,6 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 
 	var where []string
 	sqlStatement := `SELECT * FROM products WHERE properties ->> 'removed' = 'false'`
-	collection_uid := "0"
 	limit := "10"
 	offset := "0"
 
@@ -42,17 +41,13 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 			continue
 		}
 		if k == "collection_uid" {
-			collection_uid = v[0]
+			where = append(where, fmt.Sprintf(`line ->> '%s' = '%s'`, k, v[0]))
 			continue
 		}
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
 	}
 
-	if len(where) == 0 && collection_uid != "0" {
-		sqlStatement = sqlStatement + ` AND line ->> 'collection_uid' = '` + collection_uid + `' AND `
-	} else if len(where) > 0 && collection_uid != "0" {
-		sqlStatement = sqlStatement + ` AND line ->> 'collection_uid' = '` + collection_uid + `' AND ` + strings.Join(where, " AND ")
-	} else if len(where) > 0 && collection_uid == "0" {
+	if len(where) > 0 {
 		sqlStatement = sqlStatement + ` AND ` + strings.Join(where, " AND ")
 	}
 
