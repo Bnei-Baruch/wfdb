@@ -52,11 +52,11 @@ func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 	}
 
 	if archive == "false" {
-		sqlStatement = sqlStatement + ` AND properties ->> 'archive' != 'true'`
+		sqlStatement = sqlStatement + ` AND properties ->> 'archive' != 'true' AND `
 	}
 
 	if archive == "true" {
-		sqlStatement = sqlStatement + ` AND properties ->> 'archive' = 'true'`
+		sqlStatement = sqlStatement + ` AND properties ->> 'archive' = 'true' AND `
 	}
 
 	if len(where) > 0 {
