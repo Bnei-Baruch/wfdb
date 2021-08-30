@@ -32,13 +32,14 @@ func (a *App) InitDB() {
 	user := common.APP_DB_USERNAME
 	password := common.APP_DB_PASSWORD
 	dbname := common.APP_DB_NAME
+	dbhost := common.APP_DB_HOST
+	dbport := common.APP_DB_PORT
 	host := common.METUS_DB_HOST
 	user_id := common.METUS_DB_USERNAME
 	pass := common.METUS_DB_PASSWORD
 	name := common.METUS_DB_NAME
 
-	connectionString :=
-		fmt.Sprintf("postgres://%s:%s@localhost/%s?sslmode=disable", user, password, dbname)
+	connectionString := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, dbhost, dbport, dbname)
 
 	var err error
 	a.DB, err = sql.Open("postgres", connectionString)
