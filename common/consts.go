@@ -10,6 +10,8 @@ var (
 	APP_DB_USERNAME   = os.Getenv("APP_DB_USERNAME")
 	APP_DB_PASSWORD   = os.Getenv("APP_DB_PASSWORD")
 	APP_DB_NAME       = os.Getenv("APP_DB_NAME")
+	APP_DB_HOST       = os.Getenv("APP_DB_HOST")
+	APP_DB_PORT       = os.Getenv("APP_DB_PORT")
 	METUS_DB_HOST     = os.Getenv("METUS_DB_HOST")
 	METUS_DB_USERNAME = os.Getenv("METUS_DB_USERNAME")
 	METUS_DB_PASSWORD = os.Getenv("METUS_DB_PASSWORD")
