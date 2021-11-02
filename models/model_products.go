@@ -27,7 +27,7 @@ type Products struct {
 func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 
 	var where []string
-	sqlStatement := `SELECT * FROM products WHERE properties ->> 'removed' = 'false'`
+	sqlStatement := `SELECT * FROM products WHERE properties['removed'] = 'false'`
 	limit := "10"
 	offset := "0"
 
@@ -41,7 +41,7 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 			continue
 		}
 		if k == "collection_uid" {
-			where = append(where, fmt.Sprintf(`line ->> '%s' = '%s'`, k, v[0]))
+			where = append(where, fmt.Sprintf(`line['%s'] = '"%s"'`, k, v[0]))
 			continue
 		}
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
@@ -82,7 +82,7 @@ func FindProduct(db *sql.DB, values url.Values) ([]Products, error) {
 
 func FindProductByJSON(db *sql.DB, ep string, key string, value string) ([]Products, error) {
 
-	sqlStatement := fmt.Sprintf("SELECT * FROM products WHERE %s ->> '%s' = '%s' ORDER BY product_id;", ep, key, value)
+	sqlStatement := fmt.Sprintf(`SELECT * FROM products WHERE %s['%s'] = '"%s"' ORDER BY product_id;`, ep, key, value)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -145,7 +145,7 @@ func GetListProducts(db *sql.DB, start, count int) ([]Products, error) {
 
 func GetActiveProducts(db *sql.DB, language string) ([]Products, error) {
 	rows, err := db.Query(
-		"SELECT * FROM products WHERE properties ->> 'removed' = 'false' AND line ->> $1 IS NOT NULL ORDER BY product_id", language)
+		"SELECT * FROM products WHERE properties['removed'] = 'false' AND line ->> $1 IS NOT NULL ORDER BY product_id", language)
 
 	if err != nil {
 		return nil, err
