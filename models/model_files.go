@@ -29,7 +29,7 @@ type Files struct {
 func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 
 	var where []string
-	sqlStatement := `SELECT * FROM files WHERE properties ->> 'removed' = 'false'`
+	sqlStatement := `SELECT * FROM files WHERE properties['removed'] = 'false'`
 
 	limit := "100"
 	offset := "0"
@@ -43,8 +43,8 @@ func FindFiles(db *sql.DB, values url.Values) ([]Files, error) {
 			offset = v[0]
 			continue
 		}
-		if k == "archive" {
-			where = append(where, fmt.Sprintf(`properties ->> '%s' = '%s'`, k, v[0]))
+		if k == "archive" || k == "mdb" {
+			where = append(where, fmt.Sprintf(`properties['%s'] = '%s'`, k, v[0]))
 			continue
 		}
 		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
