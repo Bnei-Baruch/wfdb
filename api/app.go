@@ -266,6 +266,16 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.PostStateValue).Methods("POST")
 	a.Router.HandleFunc("/{tag}/{id}", a.DeleteState).Methods("DELETE")
 	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.DeleteStateJSON).Methods("DELETE")
+	// Cloud
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.PostCloudID).Methods("PUT")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/status", a.PostCloudStatus).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/prop", a.PostCloudProp).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/{prop}/{jsonb}", a.SetCloudJSON).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.GetCloudID).Methods("GET")
+	a.Router.HandleFunc("/cloud/{id:[0-9]+}", a.GetCloudByID).Methods("GET")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.DeleteCloudID).Methods("DELETE")
+	a.Router.HandleFunc("/cloud", a.GetListClouds).Methods("GET")
+	a.Router.HandleFunc("/cloud/find", a.FindCloud).Methods("GET")
 }
 
 func (a *App) initMQTT() {
