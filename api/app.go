@@ -255,6 +255,16 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/labels", a.GetLabels).Methods("GET")
 	a.Router.HandleFunc("/label/{id:[0-9]+}", a.GetLabel).Methods("GET")
 	a.Router.HandleFunc("/labels/find", a.FindLabels).Methods("GET")
+	// Cloud
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.PostCloudID).Methods("PUT")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/status", a.PostCloudStatus).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/prop", a.PostCloudProp).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/{prop}/{jsonb}", a.SetCloudJSON).Methods("POST")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.GetCloudID).Methods("GET")
+	a.Router.HandleFunc("/cloud/{id:[0-9]+}", a.GetCloudByID).Methods("GET")
+	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.DeleteCloudID).Methods("DELETE")
+	a.Router.HandleFunc("/cloud", a.GetListClouds).Methods("GET")
+	a.Router.HandleFunc("/cloud/find", a.FindCloud).Methods("GET")
 	// State
 	a.Router.HandleFunc("/states", a.GetStates).Methods("GET")
 	a.Router.HandleFunc("/{tag}", a.GetStateByTag).Methods("GET")
@@ -266,16 +276,6 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.PostStateValue).Methods("POST")
 	a.Router.HandleFunc("/{tag}/{id}", a.DeleteState).Methods("DELETE")
 	a.Router.HandleFunc("/{tag}/{id}/{jsonb}", a.DeleteStateJSON).Methods("DELETE")
-	// Cloud
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.PostCloudID).Methods("PUT")
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/status", a.PostCloudStatus).Methods("POST")
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/prop", a.PostCloudProp).Methods("POST")
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}/{prop}/{jsonb}", a.SetCloudJSON).Methods("POST")
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.GetCloudID).Methods("GET")
-	a.Router.HandleFunc("/cloud/{id:[0-9]+}", a.GetCloudByID).Methods("GET")
-	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.DeleteCloudID).Methods("DELETE")
-	a.Router.HandleFunc("/cloud", a.GetListClouds).Methods("GET")
-	a.Router.HandleFunc("/cloud/find", a.FindCloud).Methods("GET")
 }
 
 func (a *App) initMQTT() {
