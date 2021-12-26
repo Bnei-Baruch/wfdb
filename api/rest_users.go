@@ -61,7 +61,7 @@ func (a *App) GetListUsers(w http.ResponseWriter, r *http.Request) {
 func (a *App) GetUsersID(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 
 	if err := t.GetUsersID(a.DB); err != nil {
 		switch err {
@@ -97,7 +97,7 @@ func (a *App) GetUsersByID(w http.ResponseWriter, r *http.Request) {
 func (a *App) PostUsersID(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 
 	d := json.NewDecoder(r.Body)
 	if err := d.Decode(&t); err != nil {
@@ -118,7 +118,7 @@ func (a *App) PostUsersID(w http.ResponseWriter, r *http.Request) {
 func (a *App) PostUsersJSON(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 	key := vars["jsonb"]
 	var jsonb map[string]interface{}
 
@@ -141,7 +141,7 @@ func (a *App) PostUsersJSON(w http.ResponseWriter, r *http.Request) {
 func (a *App) SetUsersJSON(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 	key := vars["jsonb"]
 	prop := vars["prop"]
 	var value interface{}
@@ -163,7 +163,7 @@ func (a *App) SetUsersJSON(w http.ResponseWriter, r *http.Request) {
 func (a *App) PostUsersStatus(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
@@ -178,7 +178,7 @@ func (a *App) PostUsersStatus(w http.ResponseWriter, r *http.Request) {
 func (a *App) PostUsersProp(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 	key := r.FormValue("key")
 	value := r.FormValue("value")
 
@@ -193,7 +193,7 @@ func (a *App) PostUsersProp(w http.ResponseWriter, r *http.Request) {
 func (a *App) DeleteUsersID(w http.ResponseWriter, r *http.Request) {
 	var t models.Users
 	vars := mux.Vars(r)
-	t.OID = vars["id"]
+	t.UserID = vars["id"]
 
 	if err := t.DeleteUsersID(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
