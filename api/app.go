@@ -265,6 +265,16 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/cloud/{id:o[0-9]+}", a.DeleteCloudID).Methods("DELETE")
 	a.Router.HandleFunc("/cloud", a.GetListClouds).Methods("GET")
 	a.Router.HandleFunc("/cloud/find", a.FindCloud).Methods("GET")
+	// Users
+	a.Router.HandleFunc("/users/{id}", a.PostUsersID).Methods("PUT")
+	a.Router.HandleFunc("/users/{id}/status", a.PostUsersStatus).Methods("POST")
+	a.Router.HandleFunc("/users/{id}/prop", a.PostUsersProp).Methods("POST")
+	a.Router.HandleFunc("/users/{id}/{prop}/{jsonb}", a.SetUsersJSON).Methods("POST")
+	a.Router.HandleFunc("/users/{id}", a.GetUsersID).Methods("GET")
+	a.Router.HandleFunc("/users/{id}", a.GetUsersByID).Methods("GET")
+	a.Router.HandleFunc("/users/{id}", a.DeleteUsersID).Methods("DELETE")
+	a.Router.HandleFunc("/users", a.GetListUsers).Methods("GET")
+	a.Router.HandleFunc("/users/find", a.FindUsers).Methods("GET")
 	// State
 	a.Router.HandleFunc("/states", a.GetStates).Methods("GET")
 	a.Router.HandleFunc("/{tag}", a.GetStateByTag).Methods("GET")
