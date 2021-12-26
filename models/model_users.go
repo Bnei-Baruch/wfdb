@@ -155,7 +155,7 @@ func (t *Users) PostUsersID(db *sql.DB) error {
 
 	err := db.QueryRow(
 		"INSERT INTO users(user_id, first_name, last_name, email, properties) VALUES($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO UPDATE SET (user_id, first_name, last_name, email, properties) = ($1, $2, $3, $4, $5) WHERE users.user_id = $1 RETURNING id",
-		&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties).Scan(&t.ID)
+		&t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties).Scan(&t.ID)
 
 	if err != nil {
 		return err
