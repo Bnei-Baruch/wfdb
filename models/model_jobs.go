@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"net/url"
+	"strings"
 )
 
 type Jobs struct {
@@ -21,8 +23,34 @@ type Jobs struct {
 	Wfstatus map[string]interface{} `json:"wfstatus"`
 }
 
-func FindJob(db *sql.DB, key string, value string) ([]Jobs, error) {
-	sqlStatement := `SELECT * FROM jobs WHERE ` + key + ` LIKE '%` + value + `%' ORDER BY job_id`
+func FindJob(db *sql.DB, values url.Values) ([]Jobs, error) {
+	var where []string
+	sqlStatement := `SELECT * FROM jobs WHERE wfstatus['removed'] = 'false'`
+	limit := "10"
+	offset := "0"
+
+	for k, v := range values {
+		if k == "limit" {
+			limit = v[0]
+			continue
+		}
+		if k == "offset" {
+			offset = v[0]
+			continue
+		}
+		if k == "doers" {
+			where = append(where, fmt.Sprintf(`parent['%s'] ? '"%s"'`, k, v[0]))
+			continue
+		}
+		where = append(where, fmt.Sprintf(`"%s" = '%s'`, k, v[0]))
+	}
+
+	if len(where) > 0 {
+		sqlStatement = sqlStatement + ` AND ` + strings.Join(where, " AND ")
+	}
+
+	sqlStatement = sqlStatement + fmt.Sprintf(` ORDER BY job_id DESC LIMIT %s OFFSET %s`, limit, offset)
+
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
@@ -53,7 +81,7 @@ func FindJob(db *sql.DB, key string, value string) ([]Jobs, error) {
 
 func FindJobByJSON(db *sql.DB, ep string, key string, value string) ([]Jobs, error) {
 
-	sqlStatement := fmt.Sprintf("SELECT id, job_id, date, file_name, ,job_name, job_type, parent, line, original, proxy, product, wfstatus FROM jobs WHERE %s ->> '%s' = '%s' ORDER BY job_id;", ep, key, value)
+	sqlStatement := fmt.Sprintf(`SELECT * FROM jobs WHERE %s['%s'] = '"%s"' ORDER BY job_id;`, ep, key, value)
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {

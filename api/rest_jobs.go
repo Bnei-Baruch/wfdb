@@ -12,10 +12,9 @@ import (
 )
 
 func (a *App) FindJob(w http.ResponseWriter, r *http.Request) {
-	key := r.FormValue("key")
-	value := r.FormValue("value")
+	values := r.URL.Query()
 
-	files, err := models.FindJob(a.DB, key, value)
+	files, err := models.FindJob(a.DB, values)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
