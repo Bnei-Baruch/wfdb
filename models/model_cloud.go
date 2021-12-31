@@ -17,8 +17,8 @@ type Clouds struct {
 	Extension string      `json:"extension"`
 	Language  string      `json:"language"`
 	Source    string      `json:"source"`
-	UID       string      `json:"uid"`
 	WID       string      `json:"wid"`
+	UID       string      `json:"uid"`
 	Pattern   string      `json:"pattern"`
 	Props     interface{} `json:"properties"`
 	Url       string      `json:"url"`
@@ -63,7 +63,7 @@ func FindCloud(db *sql.DB, values url.Values) ([]Clouds, error) {
 		var t Clouds
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url); err != nil {
+			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -89,7 +89,7 @@ func FindCloudByJSON(db *sql.DB, ep string, key string, value string) ([]Clouds,
 		var t Clouds
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url); err != nil {
+			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -120,7 +120,7 @@ func GetListClouds(db *sql.DB, start, count int) ([]Clouds, error) {
 		var t Clouds
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url); err != nil {
+			&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -135,7 +135,7 @@ func (t *Clouds) GetCloudID(db *sql.DB) error {
 
 	err := db.QueryRow("SELECT * FROM cloud WHERE oid = $1",
 		t.OID).Scan(
-		&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url)
+		&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url)
 	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
@@ -148,7 +148,7 @@ func (t *Clouds) GetCloudByID(db *sql.DB) error {
 	var properties []byte
 
 	err := db.QueryRow("SELECT * FROM cloud WHERE id = $1",
-		t.ID).Scan(&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url)
+		t.ID).Scan(&t.ID, &t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url)
 	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
@@ -161,8 +161,8 @@ func (t *Clouds) PostCloudID(db *sql.DB) error {
 	properties, _ := json.Marshal(t.Props)
 
 	err := db.QueryRow(
-		"INSERT INTO cloud(oid, date, name, type, extension, language, source, uid, wid, pattern, properties, url) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (oid) DO UPDATE SET (oid, date, name, type, extension, language, source, uid, wid, pattern, properties, url) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE cloud.oid = $1 RETURNING id",
-		&t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.UID, &t.WID, &t.Pattern, &properties, &t.Url).Scan(&t.ID)
+		"INSERT INTO cloud(oid, date, name, type, extension, language, source, wid, uid, pattern, properties, url) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) ON CONFLICT (oid) DO UPDATE SET (oid, date, name, type, extension, language, wid, source, uid, pattern, properties, url) = ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) WHERE cloud.oid = $1 RETURNING id",
+		&t.OID, &t.Date, &t.Name, &t.Type, &t.Extension, &t.Language, &t.Source, &t.WID, &t.UID, &t.Pattern, &properties, &t.Url).Scan(&t.ID)
 
 	if err != nil {
 		return err
