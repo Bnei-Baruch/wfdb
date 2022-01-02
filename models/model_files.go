@@ -137,7 +137,7 @@ func (a *Files) GetFile(db *sql.DB) error {
 	var properties, media_info []byte
 
 	err := db.QueryRow("SELECT * FROM files WHERE file_id = $1",
-		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID)
+		a.FileID).Scan(&a.ID, &a.FileID, &a.Date, &a.FileName, &a.Extension, &a.Size, &a.Sha1, &a.FileType, &a.Language, &a.MimeType, &a.UID, &a.WID, &properties, &a.ProductID, &media_info)
 	json.Unmarshal(properties, &a.Props)
 	json.Unmarshal(media_info, &a.MediaInfo)
 
