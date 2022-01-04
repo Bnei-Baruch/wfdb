@@ -136,6 +136,8 @@ func (a *App) PostJobID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("jobs")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -159,6 +161,8 @@ func (a *App) PostJobJSON(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("jobs")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -174,6 +178,8 @@ func (a *App) PostJobValue(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	go a.SendMessage("jobs")
+
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -186,6 +192,8 @@ func (a *App) DeleteJobID(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	go a.SendMessage("jobs")
 
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
 }

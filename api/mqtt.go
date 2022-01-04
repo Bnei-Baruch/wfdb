@@ -139,6 +139,11 @@ func (a *App) SendMessage(id string) {
 		m, _ = models.GetBdika(a.DB)
 	}
 
+	if id == "jobs" {
+		topic = common.StateJobsTopic
+		m, _ = models.GetActiveJobs(a.DB)
+	}
+
 	if id == "langcheck" {
 		topic = common.StateLangcheckTopic
 		var s models.State
