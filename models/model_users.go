@@ -15,6 +15,7 @@ type Users struct {
 	LastName  string      `json:"lastName"`
 	Email     string      `json:"email"`
 	Props     interface{} `json:"properties"`
+	Role      string      `json:"role"`
 }
 
 func FindUsers(db *sql.DB, values url.Values) ([]Users, error) {
@@ -56,7 +57,7 @@ func FindUsers(db *sql.DB, values url.Values) ([]Users, error) {
 		var t Users
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties); err != nil {
+			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -82,7 +83,7 @@ func FindUsersByJSON(db *sql.DB, ep string, key string, value string) ([]Users, 
 		var t Users
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties); err != nil {
+			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -113,7 +114,7 @@ func GetListUsers(db *sql.DB, start, count int) ([]Users, error) {
 		var t Users
 		var properties []byte
 		if err := rows.Scan(
-			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties); err != nil {
+			&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role); err != nil {
 			return nil, err
 		}
 		json.Unmarshal(properties, &t.Props)
@@ -128,7 +129,7 @@ func (t *Users) GetUsersID(db *sql.DB) error {
 
 	err := db.QueryRow("SELECT * FROM users WHERE user_id = $1",
 		t.UserID).Scan(
-		&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties)
+		&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role)
 	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
@@ -141,7 +142,7 @@ func (t *Users) GetUsersByID(db *sql.DB) error {
 	var properties []byte
 
 	err := db.QueryRow("SELECT * FROM users WHERE id = $1",
-		t.ID).Scan(&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties)
+		t.ID).Scan(&t.ID, &t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role)
 	json.Unmarshal(properties, &t.Props)
 	if err != nil {
 		return err
@@ -154,8 +155,8 @@ func (t *Users) PostUsersID(db *sql.DB) error {
 	properties, _ := json.Marshal(t.Props)
 
 	err := db.QueryRow(
-		"INSERT INTO users(user_id, first_name, last_name, email, properties) VALUES($1, $2, $3, $4, $5) ON CONFLICT (user_id) DO UPDATE SET (user_id, first_name, last_name, email, properties) = ($1, $2, $3, $4, $5) WHERE users.user_id = $1 RETURNING id",
-		&t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties).Scan(&t.ID)
+		"INSERT INTO users(user_id, first_name, last_name, email, properties, role) VALUES($1, $2, $3, $4, $5, $6) ON CONFLICT (user_id) DO UPDATE SET (user_id, first_name, last_name, email, properties, role) = ($1, $2, $3, $4, $5, $6) WHERE users.user_id = $1 RETURNING id",
+		&t.UserID, &t.FirstName, &t.LastName, &t.Email, &properties, &t.Role).Scan(&t.ID)
 
 	if err != nil {
 		return err
