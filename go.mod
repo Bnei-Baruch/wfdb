@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/denisenkom/go-mssqldb v0.10.0
-	github.com/eclipse/paho.mqtt.golang v1.3.3
+	github.com/eclipse/paho.golang v0.10.0 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/jasonlvhit/gocron v0.0.1
 	github.com/lib/pq v1.10.0
