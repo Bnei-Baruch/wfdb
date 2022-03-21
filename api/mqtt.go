@@ -226,7 +226,7 @@ func (a *App) SendMessage(id string) {
 
 	pa, err := a.Msg.Publish(context.Background(), &paho.Publish{
 		QoS:     byte(1),
-		Retain:  false,
+		Retain:  true,
 		Topic:   topic,
 		Payload: message,
 	})
