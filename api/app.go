@@ -8,7 +8,7 @@ import (
 	"github.com/Bnei-Baruch/wfdb/common"
 	"github.com/Bnei-Baruch/wfdb/pkg/middleware"
 	"github.com/coreos/go-oidc"
-	"github.com/eclipse/paho.golang/paho"
+	"github.com/eclipse/paho.golang/autopaho"
 	"net/http"
 
 	_ "github.com/denisenkom/go-mssqldb"
@@ -25,7 +25,7 @@ type App struct {
 	DB            *sql.DB
 	MSDB          *sql.DB
 	tokenVerifier *oidc.IDTokenVerifier
-	Msg           *paho.Client
+	Msg           *autopaho.ConnectionManager
 }
 
 func (a *App) InitDB() {
@@ -290,12 +290,7 @@ func (a *App) initializeRoutes() {
 
 func (a *App) initMQTT() {
 	if common.SERVER != "" {
-		a.Msg = paho.NewClient(paho.ClientConfig{
-			ClientID:      "wfdb_mqtt_client",
-			OnClientError: a.LostMQTT,
-		})
-
-		if err := a.ConMQTT(); err != nil {
+		if err := a.Init(); err != nil {
 			log.Fatal().Str("source", "MQTT").Err(err).Msg("initialize mqtt listener")
 		}
 	}

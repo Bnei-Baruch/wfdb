@@ -2,16 +2,15 @@ package api
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/Bnei-Baruch/wfdb/common"
 	"github.com/Bnei-Baruch/wfdb/models"
+	"github.com/eclipse/paho.golang/autopaho"
 	"github.com/eclipse/paho.golang/paho"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"math"
-	"net"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -27,81 +26,61 @@ type MqttPayload struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-func connect() net.Conn {
-	var conn net.Conn
-	var err error
+func (a *App) Init() error {
+	log.Info().Str("source", "APP").Msgf("Init MQTT")
 
-	for {
-		conn, err = tls.Dial("tcp", common.SERVER, nil)
-		if err != nil {
-			log.Error().Str("source", "MQTT").Err(err).Msg("conn.Dial")
-			time.Sleep(1 * time.Second)
-		} else {
-			break
-		}
+	serverURL, err := url.Parse(common.SERVER)
+	if err != nil {
+		log.Error().Str("source", "MQTT").Err(err).Msg("environmental variable must be a valid URL")
 	}
 
-	return conn
-}
-
-func (a *App) ConMQTT() error {
-	var err error
-
-	a.Msg.Conn = connect()
-	var sessionExpiryInterval = uint32(math.MaxUint32)
-
-	cp := &paho.Connect{
-		ClientID:     "wfdb_mqtt_client",
-		KeepAlive:    10,
-		CleanStart:   true,
-		Username:     common.USERNAME,
-		Password:     []byte(common.PASSWORD),
-		UsernameFlag: true,
-		PasswordFlag: true,
-		Properties: &paho.ConnectProperties{
-			SessionExpiryInterval: &sessionExpiryInterval,
+	cliCfg := autopaho.ClientConfig{
+		BrokerUrls:        []*url.URL{serverURL},
+		KeepAlive:         10,
+		ConnectRetryDelay: 3 * time.Second,
+		OnConnectionUp: func(cm *autopaho.ConnectionManager, connAck *paho.Connack) {
+			log.Info().Str("source", "APP").Msgf("MQTT connection up")
+			if _, err := cm.Subscribe(context.Background(), &paho.Subscribe{
+				Subscriptions: map[string]paho.SubscribeOptions{
+					common.ServiceTopic: {QoS: byte(1)},
+				},
+			}); err != nil {
+				log.Error().Str("source", "MQTT").Err(err).Msg("client.Subscribe")
+				return
+			}
+			log.Info().Str("source", "APP").Msgf("MQTT subscription made")
+		},
+		OnConnectError: func(err error) { log.Error().Str("source", "MQTT").Err(err).Msg("error whilst attempting connection") },
+		ClientConfig: paho.ClientConfig{
+			ClientID: "wfdb_mqtt_client",
+			//Router: paho.RegisterHandler(common.WorkflowExec, m.execMessage),
+			Router:        paho.NewStandardRouter(),
+			OnClientError: func(err error) { log.Error().Str("source", "MQTT").Err(err).Msg("server requested disconnect:") },
+			OnServerDisconnect: func(d *paho.Disconnect) {
+				if d.Properties != nil {
+					log.Error().Str("source", "MQTT").Err(err).Msgf("MQTT server requested disconnect: %d", d.Properties.ReasonString)
+				} else {
+					log.Error().Str("source", "MQTT").Err(err).Msgf("MQTT server requested disconnect: %d", d.ReasonCode)
+				}
+			},
 		},
 	}
 
-	a.Msg.SetErrorLogger(NewPahoLogAdapter(zerolog.DebugLevel))
+	cliCfg.SetUsernamePassword(common.USERNAME, []byte(common.PASSWORD))
+
 	debugLog := NewPahoLogAdapter(zerolog.DebugLevel)
-	a.Msg.SetDebugLogger(debugLog)
-	a.Msg.PingHandler.SetDebug(debugLog)
-	a.Msg.Router.SetDebugLogger(debugLog)
 
-	ca, err := a.Msg.Connect(context.Background(), cp)
+	cliCfg.Debug = debugLog
+	cliCfg.PahoDebug = debugLog
+
+	a.Msg, err = autopaho.NewConnection(context.Background(), cliCfg)
 	if err != nil {
-		log.Error().Str("source", "MQTT").Err(err).Msg("client.Connect")
-	}
-	if ca.ReasonCode != 0 {
-		log.Error().Str("source", "MQTT").Err(err).Msgf("MQTT connect error: %d - %s", ca.ReasonCode, ca.Properties.ReasonString)
+		return err
 	}
 
-	sa, err := a.Msg.Subscribe(context.Background(), &paho.Subscribe{
-		Subscriptions: map[string]paho.SubscribeOptions{
-			common.ServiceTopic: {QoS: byte(1)},
-		},
-	})
-	if err != nil {
-		log.Error().Str("source", "MQTT").Err(err).Msg("client.Subscribe")
-	}
-	if sa.Reasons[0] != byte(1) {
-		log.Error().Str("source", "MQTT").Err(err).Msgf("MQTT subscribe error: %d ", sa.Reasons[0])
-	}
-
-	a.Msg.Router.RegisterHandler(common.ServiceTopic, a.execMessage)
+	cliCfg.Router.RegisterHandler(common.ServiceTopic, a.execMessage)
 
 	return nil
-}
-
-func (a *App) LostMQTT(err error) {
-	log.Error().Str("source", "MQTT").Err(err).Msg("Lost Connection")
-	time.Sleep(1 * time.Second)
-	if err := a.Msg.Disconnect(&paho.Disconnect{ReasonCode: 0}); err != nil {
-		log.Error().Str("source", "MQTT").Err(err).Msg("Reconnecting..")
-	}
-	time.Sleep(1 * time.Second)
-	a.initMQTT()
 }
 
 func (a *App) execMessage(m *paho.Publish) {
