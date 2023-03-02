@@ -44,6 +44,24 @@ func (a *App) GetSource(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, files)
 }
 
+func (a *App) GetSourceByUID(w http.ResponseWriter, r *http.Request) {
+	var i models.Source
+	vars := mux.Vars(r)
+	uid := vars["uid"]
+
+	if err := i.GetSourceByUID(a.DB, uid); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(w, http.StatusNotFound, "Not Found")
+		default:
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, i.Source["kmedia"])
+}
+
 func (a *App) GetSourceID(w http.ResponseWriter, r *http.Request) {
 	var i models.Source
 	vars := mux.Vars(r)

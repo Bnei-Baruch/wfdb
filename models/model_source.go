@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 )
 
 type Source struct {
@@ -41,6 +42,26 @@ func FindSource(db *sql.DB, key string, value string) ([]Source, error) {
 	}
 
 	return objects, nil
+}
+
+func (i *Source) GetSourceByUID(db *sql.DB, value string) error {
+
+	var line []byte
+	var source []byte
+	var wfstatus []byte
+
+	sqlStatement := fmt.Sprintf("SELECT * FROM source WHERE source->'kmedia'->>'file_uid' = '%s';", value)
+	err := db.QueryRow(sqlStatement).Scan(&i.ID, &i.SourceID, &i.Date, &i.FileName, &i.Sha1, &line, &source, &wfstatus)
+
+	json.Unmarshal(line, &i.Line)
+	json.Unmarshal(source, &i.Source)
+	json.Unmarshal(wfstatus, &i.Wfstatus)
+
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
 func GetSource(db *sql.DB, start, count int) ([]Source, error) {

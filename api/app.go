@@ -180,6 +180,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/source/{id:s[0-9]+}", a.DeleteSourceID).Methods("DELETE")
 	a.Router.HandleFunc("/source", a.GetSource).Methods("GET")
 	a.Router.HandleFunc("/source/find", a.FindSource).Methods("GET")
+	a.Router.HandleFunc("/source/file_uid/{uid}", a.GetSourceByUID).Methods("GET")
 	// Dgima
 	a.Router.HandleFunc("/drim", a.GetFilesToDgima).Methods("GET")
 	a.Router.HandleFunc("/cassette", a.GetCassetteFiles).Methods("GET")
